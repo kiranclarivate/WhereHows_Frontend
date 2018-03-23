@@ -22,33 +22,33 @@ import FileUtil
 
 
 class HiveLoad:
-  def __init__(self, wh_etl_exec_id='0'):
-    self.logger = LoggerFactory.getLogger("%s[%s]" % (self.__class__.__name__, wh_etl_exec_id))
+    def __init__(self, wh_etl_exec_id='0'):
+        self.logger = LoggerFactory.getLogger("%s[%s]" % (self.__class__.__name__, wh_etl_exec_id))
 
-    # set up connection
-    username = args[Constant.WH_DB_USERNAME_KEY]
-    password = args[Constant.WH_DB_PASSWORD_KEY]
-    JDBC_DRIVER = args[Constant.WH_DB_DRIVER_KEY]
-    JDBC_URL = args[Constant.WH_DB_URL_KEY]
-    self.conn_mysql = zxJDBC.connect(JDBC_URL, username, password, JDBC_DRIVER)
-    self.conn_cursor = self.conn_mysql.cursor()
+        # set up connection
+        username = args[Constant.WH_DB_USERNAME_KEY]
+        password = args[Constant.WH_DB_PASSWORD_KEY]
+        JDBC_DRIVER = args[Constant.WH_DB_DRIVER_KEY]
+        JDBC_URL = args[Constant.WH_DB_URL_KEY]
+        self.conn_mysql = zxJDBC.connect(JDBC_URL, username, password, JDBC_DRIVER)
+        self.conn_cursor = self.conn_mysql.cursor()
 
-    if Constant.INNODB_LOCK_WAIT_TIMEOUT in args:
-      lock_wait_time = args[Constant.INNODB_LOCK_WAIT_TIMEOUT]
-      self.conn_cursor.execute("SET innodb_lock_wait_timeout = %s;" % lock_wait_time)
+        if Constant.INNODB_LOCK_WAIT_TIMEOUT in args:
+            lock_wait_time = args[Constant.INNODB_LOCK_WAIT_TIMEOUT]
+            self.conn_cursor.execute("SET innodb_lock_wait_timeout = %s;" % lock_wait_time)
 
-    temp_dir = FileUtil.etl_temp_dir(args, "HIVE")
-    self.input_schema_file = os.path.join(temp_dir, args[Constant.HIVE_SCHEMA_CSV_FILE_KEY])
-    self.input_field_file = os.path.join(temp_dir, args[Constant.HIVE_FIELD_METADATA_KEY])
-    self.input_instance_file = os.path.join(temp_dir, args[Constant.HIVE_INSTANCE_CSV_FILE_KEY])
-    self.input_dependency_file = os.path.join(temp_dir, args[Constant.HIVE_DEPENDENCY_CSV_FILE_KEY])
+        temp_dir = FileUtil.etl_temp_dir(args, "HIVE")
+        self.input_schema_file = os.path.join(temp_dir, args[Constant.HIVE_SCHEMA_CSV_FILE_KEY])
+        self.input_field_file = os.path.join(temp_dir, args[Constant.HIVE_FIELD_METADATA_KEY])
+        self.input_instance_file = os.path.join(temp_dir, args[Constant.HIVE_INSTANCE_CSV_FILE_KEY])
+        self.input_dependency_file = os.path.join(temp_dir, args[Constant.HIVE_DEPENDENCY_CSV_FILE_KEY])
 
-    self.db_id = args[Constant.JOB_REF_ID_KEY]
-    self.wh_etl_exec_id = args[Constant.WH_EXEC_ID_KEY]
+        self.db_id = args[Constant.JOB_REF_ID_KEY]
+        self.wh_etl_exec_id = args[Constant.WH_EXEC_ID_KEY]
 
 
-  def load_metadata(self):
-    load_cmd = """
+    def load_metadata(self):
+        load_cmd = """
         DELETE FROM stg_dict_dataset WHERE db_id = {db_id};
 
         LOAD DATA LOCAL INFILE '{source_file}'
@@ -99,7 +99,8 @@ class HiveLoad:
           source_created_time,
           source_modified_time,
           created_time,
-          wh_etl_exec_id
+          wh_etl_exec_id,
+          db_id
         )
         select s.name, s.schema, s.schema_type, s.fields,
           s.properties, s.urn,
@@ -108,7 +109,7 @@ class HiveLoad:
           s.dataset_type, s.hive_serdes_class, s.is_partitioned,
           s.partition_layout_pattern_id, s.sample_partition_full_path,
           s.source_created_time, s.source_modified_time, UNIX_TIMESTAMP(now()),
-          s.wh_etl_exec_id
+          s.wh_etl_exec_id, s.db_id
         from stg_dict_dataset s
         where s.db_id = {db_id}
         on duplicate key update
@@ -120,18 +121,23 @@ class HiveLoad:
           source_created_time=s.source_created_time, source_modified_time=s.source_modified_time,
           modified_time=UNIX_TIMESTAMP(now()), wh_etl_exec_id=s.wh_etl_exec_id
         ;
+        
+        -- handle deleted or renamed hive tables 
+        DELETE ds from dict_dataset ds 
+        where ds.db_id = {db_id} AND NOT EXISTS (select 1 from stg_dict_dataset where urn = ds.urn)
+        ;
         """.format(source_file=self.input_schema_file, db_id=self.db_id, wh_etl_exec_id=self.wh_etl_exec_id)
 
-    self.executeCommands(load_cmd)
-    self.logger.info("Load dataset metadata.")
+        self.executeCommands(load_cmd)
+        self.logger.info("Load dataset metadata.")
 
 
-  def load_field(self):
-    """
-    Load fields
-    :return:
-    """
-    load_cmd = """
+    def load_field(self):
+        """
+        Load fields
+        :return:
+        """
+        load_cmd = """
         DELETE FROM stg_dict_field_detail WHERE db_id = {db_id};
 
         LOAD DATA LOCAL INFILE '{source_file}'
@@ -285,16 +291,16 @@ class HiveLoad:
         and sd.db_id = {db_id};
         """.format(source_file=self.input_field_file, db_id=self.db_id)
 
-    self.executeCommands(load_cmd)
-    self.logger.info("Load dataset fields.")
+        self.executeCommands(load_cmd)
+        self.logger.info("Load dataset fields.")
 
 
-  def load_dataset_instance(self):
-      """
-      Load dataset instance
-      :return:
-      """
-      load_cmd = """
+    def load_dataset_instance(self):
+        """
+        Load dataset instance
+        :return:
+        """
+        load_cmd = """
         DELETE FROM stg_dict_dataset_instance WHERE db_id = {db_id};
 
         LOAD DATA LOCAL INFILE '{source_file}'
@@ -351,16 +357,16 @@ class HiveLoad:
           ;
         """.format(source_file=self.input_instance_file, db_id=self.db_id, wh_etl_exec_id=self.wh_etl_exec_id)
 
-      self.executeCommands(load_cmd)
-      self.logger.info("Load dataset instance.")
+        self.executeCommands(load_cmd)
+        self.logger.info("Load dataset instance.")
 
 
-  def load_dataset_dependencies(self):
-      """
-      Load dataset dependencies
-      :return:
-      """
-      load_cmd = """
+    def load_dataset_dependencies(self):
+        """
+        Load dataset dependencies
+        :return:
+        """
+        load_cmd = """
         DELETE FROM stg_cfg_object_name_map;
         LOAD DATA LOCAL INFILE '{source_file}'
         INTO TABLE stg_cfg_object_name_map
@@ -427,29 +433,29 @@ class HiveLoad:
           WHERE c.object_name is null;
         """.format(source_file=self.input_dependency_file)
 
-      # didn't load into final table for now
-      self.executeCommands(load_cmd)
-      self.logger.info("Load dataset dependencies.")
+        # didn't load into final table for now
+        self.executeCommands(load_cmd)
+        self.logger.info("Load dataset dependencies.")
 
 
-  def executeCommands(self, commands):
-      for cmd in commands.split(";"):
-          self.logger.debug(cmd)
-          self.conn_cursor.execute(cmd)
-          self.conn_mysql.commit()
+    def executeCommands(self, commands):
+        for cmd in commands.split(";"):
+            self.logger.debug(cmd)
+            self.conn_cursor.execute(cmd)
+            self.conn_mysql.commit()
 
 
 if __name__ == "__main__":
-  args = sys.argv[1]
+    args = sys.argv[1]
 
-  l = HiveLoad(args[Constant.WH_EXEC_ID_KEY])
+    l = HiveLoad(args[Constant.WH_EXEC_ID_KEY])
 
-  try:
-    l.load_metadata()
-    l.load_dataset_instance()
-    l.load_dataset_dependencies()
-    l.load_field()
-  except Exception as e:
-    l.logger.error(str(e))
-  finally:
-    l.conn_mysql.close()
+    try:
+        l.load_metadata()
+        l.load_dataset_instance()
+        l.load_dataset_dependencies()
+        l.load_field()
+    except Exception as e:
+        l.logger.error(str(e))
+    finally:
+        l.conn_mysql.close()
