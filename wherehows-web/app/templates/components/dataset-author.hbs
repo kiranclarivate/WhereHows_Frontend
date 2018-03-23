@@ -1,0 +1,78 @@
+<td>
+  {{user-avatar userName=owner.userName}}
+  {{owner.userName}}
+</td>
+
+<td>
+  {{owner.name}}
+</td>
+
+<td>
+  {{owner.idType}}
+</td>
+
+{{!-- hides source column for confirmed owners--}}
+{{#unless isOwnerMutable}}
+
+  <td>
+    {{owner.source}}
+  </td>
+
+{{/unless}}
+
+<td>
+  {{#if owner.modifiedTime}}
+    {{moment-calendar owner.modifiedTime sameElse="MMM Do YYYY, h:mm a"}}
+  {{else}}
+
+    <button
+      class="nacho-button nacho-button--small dataset-author-record__action--disabled">
+      Not Saved
+    </button>
+
+  {{/if}}
+</td>
+
+
+<td>
+  {{ember-selector
+    class=(unless isOwnerMutable "nacho-select--hidden-state")
+    values=ownerTypes
+    selected=owner.type
+    disabled=(not isOwnerMutable)
+    selectionDidChange=(action "changeOwnerType")
+  }}
+</td>
+
+<td>
+  {{#if isOwnerMutable}}
+
+    <button
+      class="nacho-button nacho-button--small remove-dataset-author"
+      {{action "removeOwner"}}>
+      <i class="fa fa-trash"
+         aria-label="Remove Owner"></i>
+    </button>
+
+  {{else}}
+
+    {{#if isConfirmedSuggestedOwner}}
+
+      <button
+        class="nacho-button nacho-button--small dataset-author-record__action--disabled">
+        Added
+      </button>
+
+    {{else}}
+
+      <button
+        class="nacho-button nacho-button--small confirm-suggested-dataset-author"
+        {{action "confirmOwner"}}>
+        <i class="fa fa-plus" title="Add an Owner"></i>
+      </button>
+
+    {{/if}}
+
+  {{/if}}
+</td>
+

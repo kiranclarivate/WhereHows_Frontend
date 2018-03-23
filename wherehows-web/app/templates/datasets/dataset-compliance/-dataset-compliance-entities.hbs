@@ -1,0 +1,236 @@
+<section class="metadata-prompt">
+  <header class="metadata-prompt__header">
+    <p>
+      {{if isEditing
+           "Does any field in the schema contain an IDs (e.g. Member ID, Enterprise Profile ID etc) or other PII information?"
+           "IDs and PII in the schema"}}
+      <a
+        target="_blank"
+        href="http://go/gdpr-pii">
+        <sup>
+          More Info
+
+          <span class="glyphicon glyphicon-question-sign"
+                title="More information on Schema field format and types"></span>
+        </sup>
+      </a>
+    </p>
+  </header>
+  {{!--Renders content of `hiddenTrackingFields` to the viewer if the dataset contains hidden tracking fields--}}
+  {{#if containsHiddenTrackingFields}}
+    {{hiddenTrackingFields}}
+  {{/if}}
+</section>
+
+<section class="compliance-entities-meta">
+  {{ember-selector
+    values=fieldReviewOptions
+    selected=(readonly fieldReviewOption)
+    selectionDidChange=(action "onFieldReviewChange")
+  }}
+
+  {{#if changeSetReviewCount}}
+    <span class="dataset-compliance-fields__has-suggestions">
+          {{changeSetReviewCount}} fields to be reviewed
+        </span>
+  {{/if}}
+</section>
+
+{{#if filteredChangeSet.length}}
+  {{#dataset-table
+    class="nacho-table--stripped dataset-compliance-fields"
+    fields=filteredChangeSet
+    sortColumnWithName=sortColumnWithName
+    filterBy=filterBy
+    sortDirection=sortDirection
+    tableRowComponent='dataset-compliance-row'
+    searchTerm=searchTerm as |table|
+  }}
+
+    {{#table.head as |head|}}
+      {{#head.column class="dataset-compliance-fields__notification-column"}}{{/head.column}}
+      {{#head.column columnName="identifierField"}}Field{{/head.column}}
+      {{#head.column columnName="dataType"}}Data Type{{/head.column}}
+      {{#head.column class="nacho-table-cell-wrapped" columnName="confidence"}}
+        System Suggestion Confidence
+      {{/head.column}}
+      {{#head.column class="nacho-table-cell-wrapped"}}Compliance Information{{/head.column}}
+    {{/table.head}}
+
+    <tr>
+      <th></th>
+      <th colspan="4">
+        {{disable-bubble-input
+          title="Search field names"
+          placeholder="Search field names"
+          value=table.searchTerm
+          on-input=(action table.filterDidChange value="target.value")
+        }}
+      </th>
+    </tr>
+
+    {{#table.body as |body|}}
+      {{#each (sort-by table.sortBy table.data) as |field|}}
+        {{#body.row
+          field=field
+          isNewComplianceInfo=isNewComplianceInfo
+          complianceFieldIdDropdownOptions=complianceFieldIdDropdownOptions
+          complianceDataTypes=complianceDataTypes
+          class=(if field.suggestion "dataset-compliance-fields__has-suggestions")
+          onFieldLogicalTypeChange=(action 'onFieldLogicalTypeChange')
+          onFieldClassificationChange=(action 'onFieldClassificationChange')
+          onSuggestionIntent=(action 'onFieldSuggestionIntentChange')
+          onFieldOwnerChange=(action 'onFieldOwnerChange')
+          onFieldIdentifierTypeChange=(action 'onFieldIdentifierTypeChange') as |row|
+        }}
+
+          {{#row.cell}}
+            {{#if (and row.suggestion (not row.suggestionResolution))}}
+
+              <span class="notification-dot notification-dot--has-prediction"
+                    aria-label="Compliance fields have suggested values"></span>
+
+            {{else}}
+
+              {{#if row.isReviewRequested}}
+                <span class="notification-dot notification-dot--needs-review"
+                      aria-label="Compliance policy for field does not exist"></span>
+              {{/if}}
+
+            {{/if}}
+          {{/row.cell}}
+
+          {{#row.cell}}
+            {{row.identifierField}}
+          {{/row.cell}}
+
+          {{#row.cell}}
+            {{row.dataType}}
+          {{/row.cell}}
+
+          {{#row.cell}}
+            {{#if row.suggestion}}
+              {{row.suggestion.confidence}}%
+              {{#if isEditing}}
+                {{auto-suggest-action type="accept" action=(action row.onSuggestionAction)}}
+                {{auto-suggest-action action=(action row.onSuggestionAction)}}
+              {{/if}}
+            {{else}}
+              {{#if row.suggestionResolution}}
+                {{row.suggestionResolution}}
+              {{else}}
+                &mdash;
+              {{/if}}
+            {{/if}}
+          {{/row.cell}}
+
+          {{#row.cell}}
+            <section class="compliance-depends compliance-depends--visible">
+              <div class="dataset-compliance-fields__form-input">
+                Field Type
+                <a
+                  target="_blank"
+                  href="http://go/metadata_acquisition#ProjectOverview-compliance">
+                  <sup>
+                    More Info
+
+                    <span class="glyphicon glyphicon-question-sign"
+                          title="More information on various IDs"></span>
+                  </sup>
+                </a>
+              </div>
+
+              {{ember-selector
+                disabled=(not isEditing)
+                values=complianceFieldIdDropdownOptions
+                selected=(readonly row.identifierType)
+                selectionDidChange=(action row.onFieldIdentifierTypeChange)
+              }}
+
+              {{#if row.identifierTypeBeforeSuggestion}}
+                <p class="dataset-compliance-fields__current-value">Current: {{row.identifierTypeBeforeSuggestion}}</p>
+              {{/if}}
+            </section>
+
+            <section class="compliance-depends {{if row.isIdType 'compliance-depends--visible'}}">
+              <div class="dataset-compliance-fields__form-input">
+                Field Format
+                <a
+                  target="_blank"
+                  href="http://go/metadata_acquisition#ProjectOverview-compliance">
+                <sup>
+                More Info
+
+                <span class="glyphicon glyphicon-question-sign"
+                      title="More information on Field Format"></span>
+                </sup>
+                </a>
+              </div>
+
+              {{ember-selector
+                disabled=(not isEditing)
+                values=row.fieldFormats
+                selected=(readonly row.logicalType)
+                selectionDidChange=(action row.onFieldLogicalTypeChange)
+              }}
+
+              {{#if row.logicalTypeBeforeSuggestion}}
+                <p class="dataset-compliance-fields__current-value">Current: {{row.logicalTypeBeforeSuggestion}}</p>
+              {{/if}}
+            </section>
+
+            <section class="compliance-depends {{if row.isIdType 'compliance-depends--visible'}}">
+              <div class="dataset-compliance-fields__form-input">
+                Not an Owner
+              </div>
+
+              {{input
+                id=(concat row.rowId '-compliance-field-owner-toggle')
+                type="checkbox"
+                class="toggle-switch toggle-switch--light"
+                disabled=(not isEditing)
+                checked=(readonly row.nonOwner)
+                change=(action row.onOwnerChange value="target.checked")
+              }}
+              <label for="{{concat row.rowId '-compliance-field-owner-toggle'}}" class="toggle-button"></label>
+            </section>
+
+            <section class="compliance-depends {{if (or row.isPiiType row.isIdType) 'compliance-depends--visible'}}">
+              <div class="dataset-compliance-fields__form-input">
+                Security Classification
+                <sup>
+                  <span
+                    class="glyphicon glyphicon-question-sign"
+                    title={{helpText.classification}}>
+                    {{tooltip-on-element
+                      event="click"
+                      hideOn="click"
+                      text=helpText.classification
+                    }}
+                  </span>
+                </sup>
+              </div>
+
+              {{ember-selector
+                class="nacho-select--hidden-state"
+                disabled=(not isEditing)
+                values=classifiers
+                selected=row.classification
+                selectionDidChange=(action row.onFieldClassificationChange)
+              }}
+            </section>
+          {{/row.cell}}
+        {{/body.row}}
+      {{/each}}
+    {{/table.body}}
+
+  {{/dataset-table}}
+
+{{else}}
+
+  {{empty-state
+    heading="No fields found"
+    subHead="If you have a filter applied, setting this to the least restrictive option may yield more results."
+  }}
+
+{{/if}}

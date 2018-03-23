@@ -1,0 +1,27 @@
+apply plugin: 'application'
+
+mainClassName = "wherehows.main.ApplicationStart"
+
+dependencies {
+    compile project(':wherehows-common')
+    compile project(':wherehows-dao')
+    compile externalDependency.jackson_databind
+    compile externalDependency.jackson_core
+    compile externalDependency.jackson_annotations
+    compile externalDependency.lombok
+    compile externalDependency.akka
+    compile externalDependency.mysql
+    compile externalDependency.guava
+    compile externalDependency.slf4j_api
+    compile externalDependency.logback
+
+    compile externalDependency.kafka_clients
+    compile externalDependency.confluent_avro_serde
+
+    testCompile externalDependency.testng
+}
+
+test {
+    // enable TestNG support (default is JUnit)
+    useTestNG()
+}

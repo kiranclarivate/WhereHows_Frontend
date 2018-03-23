@@ -1,0 +1,27 @@
+/// Search bar height
+$app-search-bar-height: 40px;
+
+.nacho-global-search {
+  color: $text-color;
+
+  &__text-input {
+    height: $app-search-bar-height;
+  }
+
+  /**
+   *  Rules for the search bar filter component
+   */
+  &__filter {
+    width: 75px;
+    display: inline-flex;
+    white-space: nowrap;
+    overflow: hidden;
+    justify-content: flex-end;
+  }
+
+  .search-button {
+    border: 1px solid $secondary-color;
+    background-color: $secondary-color;
+    color: $text-color;
+  }
+}

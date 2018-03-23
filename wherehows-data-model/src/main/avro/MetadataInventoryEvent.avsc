@@ -1,0 +1,37 @@
+{
+  "type": "record",
+  "name": "MetadataInventoryEvent",
+  "namespace": "com.linkedin.events.metadata",
+  "doc": "Kafka event for listing a complete inventory of datasets on a data platform",
+  "fields": [
+    {
+      "name": "auditHeader",
+      "type": "com.linkedin.events.KafkaAuditHeader",
+      "doc": "This header records information about the context of an event as it is emitted into kafka and is intended to be used by the kafka audit application. For more information see go/kafkaauditheader"
+    },
+    {
+      "name": "datasetList",
+      "doc": "A complete list inventory of datasets with only name and basic properties",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "DatasetInventoryItem",
+          "doc": "inventory item of dataset with only name and basic properties",
+          "fields": [
+            {
+              "name": "datasetIdentifier",
+              "type": "DatasetIdentifier",
+              "doc": "Unique Identifier of a dataset, which contains three parts: dataPlatform, name, origin"
+            },
+            {
+              "name": "datasetProperty",
+              "type": [ "null", "DatasetProperty" ],
+              "doc": "Basic properties of a dataset, such as Native Type, Case Sensitivity, URI"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

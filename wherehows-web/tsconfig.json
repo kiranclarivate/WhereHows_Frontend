@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": ["es2017.object", "es2016", "dom", "dom.iterable", "scripthost"],
+    "listEmittedFiles": true,
+    "moduleResolution": "node",
+    "allowJs": true,
+    "noEmitOnError": true,
+    "baseUrl": ".",
+    "sourceMap": true,
+    "noEmit": true,
+    "strict": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "pretty": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "paths": {
+      "wherehows-web/*": ["app/*"],
+      "wherehows-web/tests/*": ["tests/*"],
+      "wherehows-web/mirage/*": ["mirage/*"]
+    }
+  },
+  "include": ["app/**/*", "tests/**/*", "mirage/**/*"],
+  "exclude": ["tmp", "dist", "node_modules", "bower_components", "vendor", ".git", ".gradle", ".idea", "logs"]
+}

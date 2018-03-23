@@ -1,0 +1,54 @@
+apply plugin: "com.moowork.node"
+
+node {
+  // Version of node to use.
+  version = '8.9.1'
+
+  // Base URL for fetching node distributions (change if you have a mirror).
+  distBaseUrl = 'https://nodejs.org/dist'
+
+  // If true, it will download node using above parameters.
+  // If false, it will try to use globally installed node.
+  download = true
+
+  // Set the work directory for unpacking node
+  workDir = file("${project.buildDir}/nodejs")
+
+  // Set the work directory for NPM
+  yarnWorkDir = file("${project.buildDir}/yarn")
+
+  // Set the work directory where node_modules should be located
+  nodeModulesDir = file("${project.projectDir}")
+}
+
+task bowerInstall(type: NodeTask, dependsOn: yarn) {
+  script = file('node_modules/bower/lib/bin/bower.js')
+  args = ['install']
+}
+
+task emberServe(type: NodeTask, dependsOn: bowerInstall) {
+  script = file('node_modules/ember-cli/bin/ember')
+  args = ['serve']
+}
+
+task emberBuild(type: NodeTask, dependsOn: bowerInstall) {
+  script = file('node_modules/ember-cli/bin/ember')
+  args = ['build', '--environment', 'production']
+}
+
+task emberTest(type: NodeTask, dependsOn: bowerInstall) {
+  environment = ['COVERAGE': 'true']
+  script = file('node_modules/ember-cli/bin/ember')
+  args = ['test', '--launch', 'Chrome']
+}
+
+task emberCoverage(type: NodeTask, dependsOn: emberTest) {
+  script = file('node_modules/codecov/bin/codecov')
+  args = ['-f', 'coverage/coverage-final.json']
+}
+
+clean {
+  delete 'node_modules'
+  delete 'bower_components'
+  delete 'dist'
+}

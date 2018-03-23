@@ -1,0 +1,43 @@
+version = '1.0'
+
+buildscript {
+  apply from: 'gradle/scripts/repositories.gradle'
+
+  buildscript.repositories.addAll(project.repositories)
+
+  dependencies {
+    classpath 'gradle.plugin.com.palantir:jacoco-coverage:0.3.0'
+    classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1'
+    classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1'
+    classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
+  }
+}
+
+subprojects {
+  task excludegroup(type: Test) {
+    useTestNG() {
+      excludeGroups 'needConfig'
+    }
+
+    testLogging {
+      showStandardStreams = true
+    }
+  }
+}
+
+apply from: 'gradle/scripts/coverage.gradle'
+apply from: 'gradle/scripts/dependency.gradle'
+apply from: 'gradle/scripts/logging.gradle'
+apply from: 'gradle/scripts/ide.gradle'
+apply from: 'gradle/scripts/license.gradle'
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.14'
+}
+
+if (project.hasProperty('overrideBuildEnvironment')) {
+  //The property is automatically passed to the Gradle build when the project is built at LinkedIn
+  //The property contains the file path to a script plugin that 'adapts' this OS project to LinkedIn
+  //In order to adapt the project, we need to apply this script plugin:
+  apply from: project.overrideBuildEnvironment
+}
