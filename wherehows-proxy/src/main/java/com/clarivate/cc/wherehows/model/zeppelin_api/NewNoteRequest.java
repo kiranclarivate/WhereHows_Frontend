@@ -16,26 +16,39 @@ public class NewNoteRequest {
 
     private String name;
     private String tbl;
-    private String dbName;
+    //private String dbName;
     private List<Paragraph> paragraphs;
 
-    public NewNoteRequest(String name, String interpreterName, String tbl, String dbName){
+    public NewNoteRequest(String name, String interpreterName, String tbl, String dbType){
         this.name = name;
         this.tbl = tbl;
-        this.dbName = dbName;
+        // this.dbName = dbName;
 
+        /*
         Paragraph p1 = new Paragraph();
         p1.setTitle("paragraph 1");
-        String useDBSql = StringUtils.isEmpty(dbName)? "": "USE " + dbName + "\n";
-        LOG.info("Sample USEDB SQL = " + useDBSql);
+        String useDBSql = StringUtils.isEmpty(dbName) ? "" : "USE " + dbName + "\n";
+        LOG.info("Sample USE DB SQL = " + useDBSql);
         p1.setText(interpreterName + "\n" + useDBSql);
-
-        Paragraph p2 = new Paragraph();
-        p2.setTitle("paragraph 2");
-        String sampleSql = StringUtils.isEmpty(tbl)? " ": "SELECT * FROM " + tbl + " LIMIT 10\n";
+*/
+        Paragraph p = new Paragraph();
+        p.setTitle("workspace_" + tbl);
+        String sampleSql;
+        switch (dbType){
+            case "hive":
+                sampleSql =  StringUtils.isEmpty(tbl) ? " " : "SELECT * FROM " + tbl + " LIMIT 10\n";
+                break;
+            case "oracle":
+                sampleSql =  StringUtils.isEmpty(tbl) ? " " : "SELECT * FROM " + tbl + " where ROWNUM <= 10;\n";
+                break;
+            default:
+                sampleSql = "";
+        }
         LOG.info("Sample SQL = " + sampleSql);
-        p2.setText(interpreterName + "\n" + sampleSql);
-        this.paragraphs = new ArrayList<>(Arrays.asList(p1, p2));
+        p.setText(interpreterName + "\n" + sampleSql);
+
+        this.paragraphs = new ArrayList<>(Arrays.asList(p));
+
     }
 
     public String getName() {
@@ -62,12 +75,5 @@ public class NewNoteRequest {
         this.tbl = tbl;
     }
 
-    public String getDbName() {
-        return dbName;
-    }
-
-    public void setDbName(String dbName) {
-        this.dbName = dbName;
-    }
 }
 

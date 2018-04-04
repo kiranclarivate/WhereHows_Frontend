@@ -20,11 +20,11 @@ public class RestClient {
         this("");
     }
 
-    public NewNoteResponse getNewNoteResponse (String name, String interpreterName, String tbl, String db_name){
+    public NewNoteResponse getNewNoteResponse (String name, String interpreterName, String tbl, String dbType){
         RestTemplate restTemplate = new RestTemplate();
         // NewNoteResponse response = restTemplate.getForObject(zeppelinAPIUrl, NewNoteResponse.class);
 
-        HttpEntity<NewNoteRequest> request = new HttpEntity<>(getNewNoteRequest(name, interpreterName, tbl, db_name));
+        HttpEntity<NewNoteRequest> request = new HttpEntity<>(getNewNoteRequest(name, interpreterName, tbl, dbType));
         System.out.println("API URL:" + zeppelinAPIUrl);
         System.out.println("request:" + request.toString());
         NewNoteResponse response = restTemplate.postForObject(zeppelinAPIUrl, request, NewNoteResponse.class);
@@ -32,7 +32,7 @@ public class RestClient {
         return response;
     }
 
-    private NewNoteRequest getNewNoteRequest(String name, String interpreterName, String tbl, String db_name){
-        return new NewNoteRequest(name, interpreterName, tbl, db_name);
+    private NewNoteRequest getNewNoteRequest(String name, String interpreterName, String tbl, String dbType){
+        return new NewNoteRequest(name, interpreterName, tbl, dbType);
     }
 }

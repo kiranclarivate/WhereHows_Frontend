@@ -29,7 +29,7 @@ public class UserWorkspaceDao extends AbstractMySQLDAO{
 
             List<Map<String, Object>> rows = getJdbcTemplate().queryForList(sql);
 
-            System.out.print(rows);
+            LOG.info("rows::" + rows);
             if (rows.isEmpty()){
                 LOG.info("user's workspace not yet created for the db_id, creating one ...");
                 Map<String, Object> dbInfo = getDbInfo(db_id);
@@ -54,14 +54,17 @@ public class UserWorkspaceDao extends AbstractMySQLDAO{
     }
 
     private String createNewNotebook(String  user_name, int db_id, Map<String, Object> dbInfo, String zeppelinUrl, String tbl){
+        LOG.info("dbInfo::" + dbInfo);
 
         String alias = dbInfo.get("alias").toString();
         alias = StringUtils.isEmpty(alias)? "db_" + db_id : alias;   //default to db_# if not specified
 
         String interpreter_name = dbInfo.get("interpreter_name").toString();
-        String dbName = dbInfo.get("database_name").toString();
+        String dbType = dbInfo.get("type").toString();
+        LOG.info("dbType::" + dbType);
+
         RestClient client = new RestClient();
-        NewNoteResponse response = client.getNewNoteResponse(user_name+ "/" + alias, interpreter_name, tbl, dbName);
+        NewNoteResponse response = client.getNewNoteResponse(user_name+ "/" + alias, interpreter_name, tbl, dbType);
 
         String noteId = response.getBody();
 
@@ -72,17 +75,20 @@ public class UserWorkspaceDao extends AbstractMySQLDAO{
     public Map<String, Object> getDbInfo(int db_id) {
         String sql = GET_DB_INFO
                  .replace("$db_id", Integer.toString(db_id));
+        LOG.info(sql);
         List<Map<String, Object>> rows = getJdbcTemplate().queryForList(sql);
+        LOG.info ("result == " + rows);
         if (! rows.isEmpty()){
             return rows.get(0);
         } else{ //Config not done correctly
             HashMap<String, Object> result = new HashMap<>();
             //TODO: default values for db_id, type, alias, zeppelin_host, interpreter_name
             result.put("db_id", db_id);
-            result.put("type", "");
+            result.put("type", "mysql1");
             result.put("alias", "db_" + db_id);
             result.put("zeppelin_host", "");
             result.put("interpreter_name","sql");
+            result.put("database_name", "");
             return result;
         }
     }
