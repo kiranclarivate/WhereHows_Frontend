@@ -19,7 +19,7 @@ public class Hello {
     }
 
     @RequestMapping(value = "/workspace/{user_id}/{db_id}", method = RequestMethod.GET)
-    public RedirectView go(@PathVariable("user_id") String user_id,
+    public RedirectView redirect(@PathVariable("user_id") String user_id,
                            @PathVariable("db_id") String db_id,
                            @RequestParam(value = "tbl", required=false) String tbl,
                            @RequestParam(value = "parent", required=false) String parent) {

@@ -1,6 +1,6 @@
 package com.clarivate.cc.wherehows.dao;
 
-import com.clarivate.cc.wherehows.RestClient;
+import com.clarivate.cc.wherehows.ZeppelinRestClient;
 import com.clarivate.cc.wherehows.model.zeppelin_api.NewNoteResponse;
 import com.clarivate.cc.wherehows.util.Config;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public class UserWorkspaceDao extends AbstractMySQLDAO{
         }
     }
 
-    private String createNewNotebook(String  user_name, int db_id, Map<String, Object> dbInfo, String zeppelinUrl, String tbl){
+    private String createNewNotebook(String user_name, int db_id, Map<String, Object> dbInfo, String zeppelinUrl, String tbl){
         LOG.info("dbInfo::" + dbInfo);
 
         String alias = dbInfo.get("alias").toString();
@@ -63,8 +63,8 @@ public class UserWorkspaceDao extends AbstractMySQLDAO{
         String dbType = dbInfo.get("type").toString();
         LOG.info("dbType::" + dbType);
 
-        RestClient client = new RestClient();
-        NewNoteResponse response = client.getNewNoteResponse(user_name+ "/" + alias, interpreter_name, tbl, dbType);
+        ZeppelinRestClient client = new ZeppelinRestClient();
+        NewNoteResponse response = client.getNewNoteResponse(user_name,alias, interpreter_name, tbl, dbType);
 
         String noteId = response.getBody();
 
