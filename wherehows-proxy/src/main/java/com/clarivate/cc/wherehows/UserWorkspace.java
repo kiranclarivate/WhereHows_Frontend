@@ -16,49 +16,35 @@ public class UserWorkspace extends AbstractMySQLDAO {
     private static final String GET_DB_INFO = "SELECT db_id, type, zeppelin_host, interpreter_name, database_name FROM db_info WHERE db_id = $db_id";
     static Logger LOG = LoggerFactory.getLogger(UserWorkspace.class);
 
-    public String getWorkspaceUrl(String  user_name, int db_id, String zeppelinConfigPrefix, String tbl){
+    public String getWorkspaceUrl(String user_name, int db_id, String zeppelinConfigPrefix, String tbl){
         Map<String, Object> dbInfo = getDbInfo(db_id);
         /*
         {db_id=82, type=oracle, zeppelin_host=http://ec2-35-163-133-71.us-west-2.compute.amazonaws.com:8890, interpreter_name=%oracle, database_name=}
          */
-        String zeppelin_host = dbInfo.get("zeppelin_host").toString();
-        if (StringUtils.isEmpty(zeppelin_host)) {
+
+        String zeppelin_host;
+        if (dbInfo.get("zeppelin_host") == null || StringUtils.isEmpty(dbInfo.get("zeppelin_host"))){  // use default in config file
             Config config = new Config();
             zeppelin_host = config.getString(zeppelinConfigPrefix + "zeppelin.host");
+        } else {
+            zeppelin_host = dbInfo.get("zeppelin_host").toString();
         }
         String zeppelinUrl = zeppelin_host + ZEPPELIN_NOTE_PATH;
 
         String dbType = dbInfo.get("type").toString();
 
         ZeppelinRestClient apiClient = new ZeppelinRestClient();
-
         String noteId = apiClient.getUserDbNote(user_name, dbType, db_id);
         LOG.info("noteId == " + noteId);
         LOG.info(dbInfo.toString());
 
         if (noteId.isEmpty()){
-            noteId = createNewNotebook(user_name, db_id, dbInfo, zeppelinUrl, tbl);
+            noteId = apiClient.createNewNotebook(user_name, db_id, dbInfo, zeppelinUrl, tbl);
         } else{
             apiClient.addNewParagraph(noteId, dbInfo.get("interpreter_name").toString(), tbl, dbType);
         }
 
         return zeppelinUrl + noteId;
-    }
-
-    private String createNewNotebook(String user_name, int db_id, Map<String, Object> dbInfo, String zeppelinUrl, String tbl){
-        LOG.info("dbInfo::" + dbInfo);
-
-        String interpreter_name = dbInfo.get("interpreter_name").toString();
-        String dbType = dbInfo.get("type").toString();
-        LOG.info("dbType::" + dbType);
-
-        String alias = dbType + "_" + db_id;
-
-        ZeppelinRestClient client = new ZeppelinRestClient();
-        APIResponse response = client.getNewNoteResponse(user_name,alias, interpreter_name, tbl, dbType);
-
-        String noteId = response.getBody();
-        return noteId;
     }
 
     private Map<String, Object> getDbInfo(int db_id) {

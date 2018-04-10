@@ -11,6 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *  @deprecated
+ *  Use com.clarivate.cc.wherehows.UserWorkspace instead
+ */
+@Deprecated
 public class UserWorkspaceDao extends AbstractMySQLDAO{
 
     static Logger LOG = LoggerFactory.getLogger(UserWorkspaceDao.class);
@@ -96,4 +101,5 @@ public class UserWorkspaceDao extends AbstractMySQLDAO{
     public void insertUserWorkspace(String user_id, int db_id, String notebook_id, String url, String interpreter_name) {
         getJdbcTemplate().update(INSERT_USER_WORKSPACE, user_id, db_id, notebook_id, url, interpreter_name);
     }
+
 }

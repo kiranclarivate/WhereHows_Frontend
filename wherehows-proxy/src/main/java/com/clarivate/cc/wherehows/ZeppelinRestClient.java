@@ -10,8 +10,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class ZeppelinRestClient {
@@ -67,7 +65,7 @@ public class ZeppelinRestClient {
         return response.getUserDbNote(userName, dbType, dbId);
     }
 
-    private boolean paragraphExists(String notebookId, String paragraphName){
+    private String getParagraphID(String notebookId, String paragraphName){
         RestTemplate restTemplate = new RestTemplate();
         NotebookStatusResponse response = restTemplate.getForObject(zeppelinAPIUrl + "/" + notebookId, NotebookStatusResponse.class);
         LOG.info("URL===" + zeppelinAPIUrl + "/" + notebookId);
@@ -75,14 +73,41 @@ public class ZeppelinRestClient {
 
         for (Paragraph p : response.getBody().getParagraphs()){
             if (p.getTitle() != null && p.getTitle().equals(paragraphName))
-                return true;
+                return p.getId();
         }
-        return false;
+        return null;
+    }
+
+    public String createNewNotebook(String user_name, int db_id, Map<String, Object> dbInfo, String zeppelinUrl, String tbl){
+        LOG.info("dbInfo::" + dbInfo);
+
+        String interpreter_name = dbInfo.get("interpreter_name").toString();
+        String dbType = dbInfo.get("type").toString();
+        String alias = dbType + "_" + db_id;  //always use alias such as "hive_1" where 1 is db_id/job_id in job file
+
+        APIResponse response = getNewNoteResponse(user_name,alias, interpreter_name, tbl, dbType);
+
+        String noteId = response.getBody();
+        return noteId;
+    }
+
+    private boolean moveParagraph(String noteId, String paragraphId, int index){
+        RestTemplate restTemplate = new RestTemplate();
+        //http://[zeppelin-server]:[zeppelin-port]/api/notebook/[noteId]/paragraph/[paragraphId]/move/[newIndex]
+        String url = zeppelinAPIUrl + "/" + noteId + "/paragraph/" + paragraphId + "/move/" + index;
+
+        LOG.info("moving to top ... " + url);
+
+        HttpEntity<Paragraph> request = new HttpEntity<>(new Paragraph());
+        APIResponse response = restTemplate.postForObject(url, request, APIResponse.class);
+        return response.getStatus().equals("OK");
     }
 
     public void addNewParagraph(String noteId, String interpreterName, String tbl, String dbType){
-        String title = "workspace_" + tbl;
-        if (paragraphExists(noteId, title)){
+        String title = "workspace_" + tbl;  // fixed naming convention
+        String paragraphId = getParagraphID(noteId, title);
+        if (paragraphId != null && !paragraphId.isEmpty()){
+            moveParagraph(noteId, paragraphId, 0);
             return;
         }
 

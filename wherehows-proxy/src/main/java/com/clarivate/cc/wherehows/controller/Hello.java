@@ -19,8 +19,9 @@ public class Hello {
         return "Hello from Wherehows Proxy!";
     }
 
+    @Deprecated
     @RequestMapping(value = "/workspace_old/{user_id}/{db_id}", method = RequestMethod.GET)
-    public RedirectView redirect(@PathVariable("user_id") String user_id,
+    public RedirectView redirectOld(@PathVariable("user_id") String user_id,
                            @PathVariable("db_id") String db_id,
                            @RequestParam(value = "tbl", required=false) String tbl,
                            @RequestParam(value = "parent", required=false) String parent) {
@@ -34,7 +35,7 @@ public class Hello {
     }
 
     @RequestMapping(value = "/workspace/{user_id}/{db_id}", method = RequestMethod.GET)
-    public RedirectView redirect1(@PathVariable("user_id") String user_id,
+    public RedirectView redirect(@PathVariable("user_id") String user_id,
                                  @PathVariable("db_id") int db_id,
                                  @RequestParam(value = "tbl", required=false) String tbl,
                                  @RequestParam(value = "parent", required=false) String parent) {
@@ -46,5 +47,4 @@ public class Hello {
         LOG.info("url ==== " + url);
         return new RedirectView(url);
     }
-
 }
