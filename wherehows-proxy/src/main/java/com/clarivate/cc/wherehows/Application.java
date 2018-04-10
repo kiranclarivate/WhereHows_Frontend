@@ -24,7 +24,7 @@ public class Application {
         System.out.println("READY ...");
 
 /*
-        ZeppelinRestClient client = new ZeppelinRestClient("");
+        RestClient client = new RestClient("");
         try {
             client.getMyNotebooks("richardx");
 

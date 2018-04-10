@@ -1,4 +1,4 @@
-package com.clarivate.cc.wherehows.model.zeppelin_api;
+package com.clarivate.cc.wherehows.zeppelin.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

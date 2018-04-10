@@ -1,8 +1,7 @@
-package com.clarivate.cc.wherehows.model.zeppelin_api;
+package com.clarivate.cc.wherehows.zeppelin.model;
 
 import com.clarivate.cc.wherehows.util.NotebookUtil;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

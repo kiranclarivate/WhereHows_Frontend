@@ -1,6 +1,6 @@
 package com.clarivate.cc.wherehows.util;
 
-import com.clarivate.cc.wherehows.model.zeppelin_api.Paragraph;
+import com.clarivate.cc.wherehows.zeppelin.model.Paragraph;
 import org.apache.commons.lang3.StringUtils;
 
 public class NotebookUtil {

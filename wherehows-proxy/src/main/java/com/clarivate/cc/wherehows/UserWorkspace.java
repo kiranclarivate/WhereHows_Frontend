@@ -1,8 +1,8 @@
 package com.clarivate.cc.wherehows;
 
 import com.clarivate.cc.wherehows.dao.AbstractMySQLDAO;
-import com.clarivate.cc.wherehows.model.zeppelin_api.APIResponse;
 import com.clarivate.cc.wherehows.util.Config;
+import com.clarivate.cc.wherehows.zeppelin.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -34,12 +34,12 @@ public class UserWorkspace extends AbstractMySQLDAO {
         String dbType = dbInfo.get("type").toString();
 
         String alias;
-        if (dbInfo.get("alias") != null && !org.apache.commons.lang3.StringUtils.isEmpty(dbInfo.get("alias").toString()))
+        if (dbInfo.get("alias") != null && ! StringUtils.isEmpty(dbInfo.get("alias").toString()))
             alias = dbInfo.get("alias").toString();
         else {
             alias = dbType + "_" + db_id;  // use alias such as "hive_1" where 1 is db_id/job_id in job file
         }
-        ZeppelinRestClient apiClient = new ZeppelinRestClient();
+        RestClient apiClient = new RestClient();
         String noteId = apiClient.getUserDbNote(user_name, alias);
         LOG.info("noteId == " + noteId);
         LOG.info(dbInfo.toString());

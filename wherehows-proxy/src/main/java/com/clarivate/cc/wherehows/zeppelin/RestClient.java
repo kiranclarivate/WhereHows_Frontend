@@ -1,10 +1,9 @@
-package com.clarivate.cc.wherehows;
+package com.clarivate.cc.wherehows.zeppelin;
 
-import com.clarivate.cc.wherehows.model.zeppelin_api.*;
 import com.clarivate.cc.wherehows.util.Config;
 import com.clarivate.cc.wherehows.util.NotebookUtil;
+import com.clarivate.cc.wherehows.zeppelin.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -13,18 +12,18 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.Map;
 
-public class ZeppelinRestClient {
+public class RestClient {
     private String zeppelinAPIUrl;
-    private static Logger LOG = LoggerFactory.getLogger(ZeppelinRestClient.class);
+    private static Logger LOG = LoggerFactory.getLogger(RestClient.class);
     private static ObjectMapper mapper = new ObjectMapper();
     private static final String ZEPPELIN_API_PATH = "/api/notebook";
 
-    public ZeppelinRestClient(String zeppelinApiUrlPrefix){
+    public RestClient(String zeppelinApiUrlPrefix){
         Config config= new Config();
         zeppelinAPIUrl = config.getString(zeppelinApiUrlPrefix + "zeppelin.host") + ZEPPELIN_API_PATH;
     }
 
-    public ZeppelinRestClient(){
+    public RestClient(){
         this("");
     }
 
