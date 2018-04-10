@@ -26,8 +26,60 @@ public class ZeppelinRestClient {
     public ZeppelinRestClient(){
         this("");
     }
+    
+    public String getUserDbNote(String userName, String dbType, int dbId){
+        RestTemplate restTemplate = new RestTemplate();
+        NoteListResponse response = restTemplate.getForObject(zeppelinAPIUrl, NoteListResponse.class);
+        return response.getUserDbNote(userName, dbType, dbId);
+    }
 
-    public APIResponse getNewNoteResponse (String userName, String notebookName, String interpreterName, String tbl, String dbType) {
+    public String createNewNotebook(String user_name, int db_id, Map<String, Object> dbInfo, String zeppelinUrl, String tbl){
+        LOG.info("dbInfo::" + dbInfo);
+
+        String interpreter_name = dbInfo.get("interpreter_name").toString();
+        String dbType = dbInfo.get("type").toString();
+        String alias = dbType + "_" + db_id;  //always use alias such as "hive_1" where 1 is db_id/job_id in job file
+
+        APIResponse response = getNewNoteResponse(user_name,alias, interpreter_name, tbl, dbType);
+
+        String noteId = response.getBody();
+        return noteId;
+    }
+
+    public void addNewParagraph(String noteId, String interpreterName, String tbl, String dbType){
+        String title = "workspace_" + tbl;  // fixed naming convention
+        String paragraphId = getParagraphID(noteId, title);
+        if (paragraphId != null && !paragraphId.isEmpty()){
+            moveParagraph(noteId, paragraphId, 0);
+            return;
+        }
+
+        LOG.info("Adding new paragraph ... ");
+        RestTemplate restTemplate = new RestTemplate();
+
+        Paragraph p = new Paragraph();
+        p.setTitle("workspace_" + tbl);
+        String sampleSql;
+        switch (dbType){
+            case "hive":
+                sampleSql =  StringUtils.isEmpty(tbl) ? " " : "-- sample query \nSELECT * FROM " + tbl + " LIMIT 10\n";
+                break;
+            case "oracle":
+                sampleSql =  StringUtils.isEmpty(tbl) ? " " : "-- sample query \nSELECT * FROM " + tbl + " where ROWNUM <= 10;\n";
+                break;
+            default:
+                sampleSql = "";
+        }
+        p.setText(interpreterName + "\n" + sampleSql);
+        p.setIndex(0);
+        HttpEntity<Paragraph> request = new HttpEntity<>(p);
+
+        APIResponse response = restTemplate.postForObject(zeppelinAPIUrl + "/" + noteId + "/paragraph", request, APIResponse.class);
+
+        LOG.info(response.toString());
+    }
+
+    private APIResponse getNewNoteResponse (String userName, String notebookName, String interpreterName, String tbl, String dbType) {
         RestTemplate restTemplate = new RestTemplate();
         // APIResponse response = restTemplate.getForObject(zeppelinAPIUrl, APIResponse.class);
 
@@ -51,7 +103,7 @@ public class ZeppelinRestClient {
         return new NewNoteRequest(name, interpreterName, tbl, dbType);
     }
 
-    public void getMyNotebooks(String userName) throws IOException {
+    private void getMyNotebooks(String userName) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
         NoteListResponse response = restTemplate.getForObject(zeppelinAPIUrl, NoteListResponse.class);
         System.out.println(response.getUserNotes(userName));
@@ -59,11 +111,6 @@ public class ZeppelinRestClient {
         LOG.info("response:" + response.getUserNotes(userName));
     }
 
-    public String getUserDbNote(String userName, String dbType, int dbId){
-        RestTemplate restTemplate = new RestTemplate();
-        NoteListResponse response = restTemplate.getForObject(zeppelinAPIUrl, NoteListResponse.class);
-        return response.getUserDbNote(userName, dbType, dbId);
-    }
 
     private String getParagraphID(String notebookId, String paragraphName){
         RestTemplate restTemplate = new RestTemplate();
@@ -78,19 +125,6 @@ public class ZeppelinRestClient {
         return null;
     }
 
-    public String createNewNotebook(String user_name, int db_id, Map<String, Object> dbInfo, String zeppelinUrl, String tbl){
-        LOG.info("dbInfo::" + dbInfo);
-
-        String interpreter_name = dbInfo.get("interpreter_name").toString();
-        String dbType = dbInfo.get("type").toString();
-        String alias = dbType + "_" + db_id;  //always use alias such as "hive_1" where 1 is db_id/job_id in job file
-
-        APIResponse response = getNewNoteResponse(user_name,alias, interpreter_name, tbl, dbType);
-
-        String noteId = response.getBody();
-        return noteId;
-    }
-
     private boolean moveParagraph(String noteId, String paragraphId, int index){
         RestTemplate restTemplate = new RestTemplate();
         //http://[zeppelin-server]:[zeppelin-port]/api/notebook/[noteId]/paragraph/[paragraphId]/move/[newIndex]
@@ -103,36 +137,5 @@ public class ZeppelinRestClient {
         return response.getStatus().equals("OK");
     }
 
-    public void addNewParagraph(String noteId, String interpreterName, String tbl, String dbType){
-        String title = "workspace_" + tbl;  // fixed naming convention
-        String paragraphId = getParagraphID(noteId, title);
-        if (paragraphId != null && !paragraphId.isEmpty()){
-            moveParagraph(noteId, paragraphId, 0);
-            return;
-        }
 
-        LOG.info("Adding new paragraph ... ");
-        RestTemplate restTemplate = new RestTemplate();
-
-        Paragraph p = new Paragraph();
-        p.setTitle("workspace_" + tbl);
-        String sampleSql;
-        switch (dbType){
-            case "hive":
-                sampleSql =  StringUtils.isEmpty(tbl) ? " " : "SELECT * FROM " + tbl + " LIMIT 10\n";
-                break;
-            case "oracle":
-                sampleSql =  StringUtils.isEmpty(tbl) ? " " : "SELECT * FROM " + tbl + " where ROWNUM <= 10;\n";
-                break;
-            default:
-                sampleSql = "";
-        }
-        p.setText(interpreterName + "\n" + sampleSql);
-        p.setIndex(0);
-        HttpEntity<Paragraph> request = new HttpEntity<>(p);
-
-        APIResponse response = restTemplate.postForObject(zeppelinAPIUrl + "/" + noteId + "/paragraph", request, APIResponse.class);
-
-        LOG.info(response.toString());
-    }
 }
