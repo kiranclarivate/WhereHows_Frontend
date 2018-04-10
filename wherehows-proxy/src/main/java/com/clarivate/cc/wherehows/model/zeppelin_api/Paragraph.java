@@ -1,6 +1,7 @@
 package com.clarivate.cc.wherehows.model.zeppelin_api;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang3.StringUtils;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Paragraph {
@@ -40,4 +41,5 @@ public class Paragraph {
     public void setId(String id) {
         this.id = id;
     }
+
 }

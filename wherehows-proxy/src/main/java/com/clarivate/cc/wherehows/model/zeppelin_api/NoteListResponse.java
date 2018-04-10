@@ -44,10 +44,10 @@ public class NoteListResponse{
         return result;
     }
 
-    public String getUserDbNote(String userName, String dbType, int dbId){
+    public String getUserDbNote(String userName, String alias){
 
         for (Map<String, String> map : this.body){
-            if (map.get("name").equals(getDefaultNoteName(userName,dbType, dbId))){
+            if (map.get("name").equals(getNotebookName(userName, alias))){
                 return map.get("id");
             }
         }
@@ -58,7 +58,7 @@ public class NoteListResponse{
         return body.toString();
     }
 
-    private String getDefaultNoteName(String userName, String dbType, int dbId){
-        return userName + "/" + dbType + "_" + dbId;
+    private String getNotebookName(String userName, String alias){
+        return userName + "/" + alias;
     }
 }

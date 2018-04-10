@@ -13,13 +13,13 @@ import java.util.Map;
 
 public class UserWorkspace extends AbstractMySQLDAO {
     private static final String ZEPPELIN_NOTE_PATH = "/#/notebook/";
-    private static final String GET_DB_INFO = "SELECT db_id, type, zeppelin_host, interpreter_name, database_name FROM db_info WHERE db_id = $db_id";
+    private static final String GET_DB_INFO = "SELECT db_id, type, zeppelin_host, interpreter_name, database_name, alias FROM db_info WHERE db_id = $db_id";
     static Logger LOG = LoggerFactory.getLogger(UserWorkspace.class);
 
     public String getWorkspaceUrl(String user_name, int db_id, String zeppelinConfigPrefix, String tbl){
         Map<String, Object> dbInfo = getDbInfo(db_id);
         /*
-        {db_id=82, type=oracle, zeppelin_host=http://ec2-35-163-133-71.us-west-2.compute.amazonaws.com:8890, interpreter_name=%oracle, database_name=}
+        {db_id=82, type=oracle, zeppelin_host=http://ec2-35-163-133-71.us-west-2.compute.amazonaws.com:8890, interpreter_name=%oracle, database_name=, alias=}
          */
 
         String zeppelin_host;
@@ -33,13 +33,19 @@ public class UserWorkspace extends AbstractMySQLDAO {
 
         String dbType = dbInfo.get("type").toString();
 
+        String alias;
+        if (dbInfo.get("alias") != null && !org.apache.commons.lang3.StringUtils.isEmpty(dbInfo.get("alias").toString()))
+            alias = dbInfo.get("alias").toString();
+        else {
+            alias = dbType + "_" + db_id;  // use alias such as "hive_1" where 1 is db_id/job_id in job file
+        }
         ZeppelinRestClient apiClient = new ZeppelinRestClient();
-        String noteId = apiClient.getUserDbNote(user_name, dbType, db_id);
+        String noteId = apiClient.getUserDbNote(user_name, alias);
         LOG.info("noteId == " + noteId);
         LOG.info(dbInfo.toString());
 
         if (noteId.isEmpty()){
-            noteId = apiClient.createNewNotebook(user_name, db_id, dbInfo, zeppelinUrl, tbl);
+            noteId = apiClient.createNewNotebook(user_name, db_id, dbInfo, alias, tbl);
         } else{
             apiClient.addNewParagraph(noteId, dbInfo.get("interpreter_name").toString(), tbl, dbType);
         }
