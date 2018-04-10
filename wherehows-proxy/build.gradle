@@ -32,14 +32,15 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-actuator")
 
     compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
-   compile("org.springframework.boot:spring-boot-starter")
-//    compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: '1.5.10.RELEASE'
+    compile("org.springframework.boot:spring-boot-starter")
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '1.5.10.RELEASE'
 
     compile group: 'com.jolbox', name: 'bonecp', version: '0.7.1.RELEASE'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
     compile group: 'org.apache.commons', name: 'commons-configuration2', version: '2.2'
     compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
+
+    compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
 
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 

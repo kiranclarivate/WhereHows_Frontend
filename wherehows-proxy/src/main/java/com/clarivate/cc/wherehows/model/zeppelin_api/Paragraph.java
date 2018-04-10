@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Paragraph {
     private String title;
     private String text;
+    private int index;
 
     public String getTitle() {
         return title;
@@ -22,5 +23,12 @@ public class Paragraph {
     public void setText(String text) {
         this.text = text;
     }
-}
 
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+}

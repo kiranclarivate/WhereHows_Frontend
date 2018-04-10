@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ApplicationContext;
-
 import java.util.Arrays;
 
 @SpringBootApplication
@@ -21,5 +20,20 @@ public class Application {
         for (String beanName : beanNames) {
             System.out.println(beanName);
         }
+
+        System.out.println("READY ...");
+
+/*
+        ZeppelinRestClient client = new ZeppelinRestClient("");
+        try {
+            client.getMyNotebooks("richardx");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        client.addNewParagraph("2DA5VZG5P",  "%hive", "test_my11_newname166", "hive");
+*/
+
     }
 }

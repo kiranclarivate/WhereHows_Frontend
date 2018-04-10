@@ -1,10 +1,9 @@
 package com.clarivate.cc.wherehows;
 
-import com.clarivate.cc.wherehows.model.zeppelin_api.NewNoteRequest;
-import com.clarivate.cc.wherehows.model.zeppelin_api.NewNoteResponse;
+import com.clarivate.cc.wherehows.model.zeppelin_api.*;
 import com.clarivate.cc.wherehows.util.Config;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -12,7 +11,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,16 +29,16 @@ public class ZeppelinRestClient {
         this("");
     }
 
-    public NewNoteResponse getNewNoteResponse (String userName, String notebookName, String interpreterName, String tbl, String dbType) {
+    public APIResponse getNewNoteResponse (String userName, String notebookName, String interpreterName, String tbl, String dbType) {
         RestTemplate restTemplate = new RestTemplate();
-        // NewNoteResponse response = restTemplate.getForObject(zeppelinAPIUrl, NewNoteResponse.class);
+        // APIResponse response = restTemplate.getForObject(zeppelinAPIUrl, APIResponse.class);
 
         String name = userName + "/" + notebookName;
 
         HttpEntity<NewNoteRequest> request = new HttpEntity<>(getNewNoteRequest(name, interpreterName, tbl, dbType));
         LOG.info("API URL:" + zeppelinAPIUrl);
         LOG.info("request:" + request.toString());
-        NewNoteResponse response = restTemplate.postForObject(zeppelinAPIUrl, request, NewNoteResponse.class);
+        APIResponse response = restTemplate.postForObject(zeppelinAPIUrl, request, APIResponse.class);
         LOG.info("response:" + response.toString());
 
         try {
@@ -55,56 +53,61 @@ public class ZeppelinRestClient {
         return new NewNoteRequest(name, interpreterName, tbl, dbType);
     }
 
-    private void getMyNotebooks(String userName) throws IOException {
+    public void getMyNotebooks(String userName) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
         NoteListResponse response = restTemplate.getForObject(zeppelinAPIUrl, NoteListResponse.class);
+        System.out.println(response.getUserNotes(userName));
+        System.out.println("notebook_id == " +response.getUserDbNote("richardx", "hive",1));
         LOG.info("response:" + response.getUserNotes(userName));
     }
 
-    static class NoteListResponse{
-        private String status;
-        private String message;
-        private List<Map<String, String>> body;
+    public String getUserDbNote(String userName, String dbType, int dbId){
+        RestTemplate restTemplate = new RestTemplate();
+        NoteListResponse response = restTemplate.getForObject(zeppelinAPIUrl, NoteListResponse.class);
+        return response.getUserDbNote(userName, dbType, dbId);
+    }
 
-        public String getStatus() {
-            return status;
+    private boolean paragraphExists(String notebookId, String paragraphName){
+        RestTemplate restTemplate = new RestTemplate();
+        NotebookStatusResponse response = restTemplate.getForObject(zeppelinAPIUrl + "/" + notebookId, NotebookStatusResponse.class);
+        LOG.info("URL===" + zeppelinAPIUrl + "/" + notebookId);
+        LOG.info("response===" + response.toString());
+
+        for (Paragraph p : response.getBody().getParagraphs()){
+            if (p.getTitle() != null && p.getTitle().equals(paragraphName))
+                return true;
+        }
+        return false;
+    }
+
+    public void addNewParagraph(String noteId, String interpreterName, String tbl, String dbType){
+        String title = "workspace_" + tbl;
+        if (paragraphExists(noteId, title)){
+            return;
         }
 
-        public void setStatus(String status) {
-            this.status = status;
+        LOG.info("Adding new paragraph ... ");
+        RestTemplate restTemplate = new RestTemplate();
+
+        Paragraph p = new Paragraph();
+        p.setTitle("workspace_" + tbl);
+        String sampleSql;
+        switch (dbType){
+            case "hive":
+                sampleSql =  StringUtils.isEmpty(tbl) ? " " : "SELECT * FROM " + tbl + " LIMIT 10\n";
+                break;
+            case "oracle":
+                sampleSql =  StringUtils.isEmpty(tbl) ? " " : "SELECT * FROM " + tbl + " where ROWNUM <= 10;\n";
+                break;
+            default:
+                sampleSql = "";
         }
+        p.setText(interpreterName + "\n" + sampleSql);
+        p.setIndex(0);
+        HttpEntity<Paragraph> request = new HttpEntity<>(p);
 
-        public String getMessage() {
-            return message;
-        }
+        APIResponse response = restTemplate.postForObject(zeppelinAPIUrl + "/" + noteId + "/paragraph", request, APIResponse.class);
 
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public List<Map<String, String>> getBody() {
-            return body;
-        }
-
-        public void setBody(List<Map<String, String>> body) {
-            this.body = body;
-        }
-
-        public List<Map<String, String>> getUserNotes(String userName){
-
-            List<Map<String, String>> result = new ArrayList<>();
-            for (Map<String, String> map : this.body){
-                if (map.get("name").startsWith(userName + "/")){
-                    result.add(map);
-                }
-            }
-
-            return result;
-
-        }
-
-        public String toString(){
-            return body.toString();
-        }
+        LOG.info(response.toString());
     }
 }
