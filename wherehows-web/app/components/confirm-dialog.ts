@@ -1,5 +1,7 @@
+import Ember from 'ember';
 import Component from 'ember-modal-dialog/components/modal-dialog';
-import { get } from '@ember/object';
+
+const { get, assert } = Ember;
 
 /**
  * The default value for content when component is rendered inline
@@ -22,6 +24,10 @@ export default Component.extend({
 
   init() {
     this._super(...Array.from(arguments));
+
+    assert('Expected a closure action handler for onClose.', typeof get(this, 'onClose') === 'function');
+
+    assert('Expected a closure action handler for onConfirm.', typeof get(this, 'onConfirm') === 'function');
   },
 
   actions: {

@@ -1,31 +1,28 @@
-import Component from '@ember/component';
-import ComputedProperty from '@ember/object/computed';
+import Ember from 'ember';
 import { avatar } from 'wherehows-web/constants';
-import { computed, get } from '@ember/object';
 
+const { Component, computed, get } = Ember;
 const { fallbackUrl, url }: { fallbackUrl: string; url: string } = avatar;
 const headlessUserName: string = 'wherehows';
 
-export default class UserAvatar extends Component {
-  tagName = 'span';
+export default Component.extend({
+  tagName: 'span',
 
   /**
-   * username for the user, e.g. ldap userName that can be used to construct the url
-   * @type {string} 
+   * @type {string} username for the user, e.g. ldap userName that can be used to construct the url
    */
-  userName: string;
+  userName: '',
 
   /**
-   * Ember.ComputedProperty that resolves with the image url for the avatar
-   * @type {ComputedProperty<string>}
-   * @memberof UserAvatar
+   * Ember.ComputerProperty that resolves with the image url for the avatar
+   * @type {string}
    */
-  imageUrl: ComputedProperty<string> = computed('userName', function(this: UserAvatar) {
+  imageUrl: computed('userName', function(this: Ember.Component) {
     const userName = get(this, 'userName');
     if (userName && userName !== headlessUserName) {
       return url.replace('[username]', userName);
     }
 
     return fallbackUrl;
-  });
-}
+  })
+});

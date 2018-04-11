@@ -3,7 +3,6 @@
 .dataset-compliance-fields {
   &__has-suggestions {
     color: $compliance-suggestion-hint;
-    margin-left: item-spacing(2);
   }
 
   &__notification-column {
@@ -11,34 +10,6 @@
   }
 
   &__classification-column {
-    width: 20%;
-  }
-
-  &__tall-cell#{&}__tall-cell {
-    vertical-align: top;
-  }
-
-  &__current-value {
-    display: inline-block;
-    height: 0;
-    padding: item-spacing(1);
-    color: set-color(grey, mid);
-  }
-
-  &__form-input {
-    padding: item-spacing(2 0);
-    margin-top: item-spacing(2);
-    opacity: 0.8;
-  }
-}
-
-.compliance-depends {
-  display: none;
-  opacity: 0;
-
-  &--visible {
-    opacity: 1;
-    display: block;
-    transition: all 0.4s ease 0.4s;
+    width: 17%;
   }
 }

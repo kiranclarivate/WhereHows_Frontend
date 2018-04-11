@@ -1,8 +1,8 @@
-import Component from '@ember/component';
-import { assert } from '@ember/debug';
+import Ember from 'ember';
 import { StreamCommentActionsUnion } from 'wherehows-web/constants';
 import { StringUnionKeyToValue } from 'wherehows-web/typings/generic';
-import noop from 'wherehows-web/utils/noop';
+
+const { Component, assert } = Ember;
 
 /**
  * Actions available for comment stream
@@ -25,24 +25,6 @@ export default Component.extend({
    */
   commentActions: CommentActions,
 
-  /**
-   * Default no-op function to add a comment
-   * @type {Function}
-   */
-  addCommentToStream: noop,
-
-  /**
-   * Default no-op function to delete a comment
-   * @type {Function}
-   */
-  deleteCommentFromStream: noop,
-
-  /**
-   * Default no-op function to update a comment
-   * @type {Function}
-   */
-  updateCommentInStream: noop,
-
   actions: {
     /**
      * Async handles CrUD operations for comment stream actions, proxies to parent closure actions
@@ -50,16 +32,16 @@ export default Component.extend({
      * @return {Promise<boolean>}
      */
     async handleStreamComment(strategy: StreamCommentActionsUnion): Promise<boolean> {
-      const [, ...args] = arguments;
+      const [, ...args] = [...Array.from(arguments)];
 
       // assert that handler is in CommentAction needed since we are calling from component template
       // TS currently has no jurisdiction there
       assert(`Expected action to be one of ${Object.keys(CommentActions)}`, strategy in CommentActions);
 
       return {
-        create: (): Promise<boolean> => this.addCommentToStream(...args),
-        destroy: (): Promise<boolean> => this.deleteCommentFromStream(...args),
-        update: (): Promise<boolean> => this.updateCommentInStream(...args)
+        create: (): Promise<boolean> => this.attrs.addCommentToStream(...args),
+        destroy: (): Promise<boolean> => this.attrs.deleteCommentFromStream(...args),
+        update: (): Promise<boolean> => this.attrs.updateCommentInStream(...args)
       }[strategy]();
     }
   }

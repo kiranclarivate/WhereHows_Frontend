@@ -1,29 +1,25 @@
-{{#if schemas.length}}
+{{#if hasSchemas}}
   <div class="row" style="margin-top: 5px; margin-bottom: 5px;">
     <div class="col-xs-12">
       <div
-        class="btn-group"
-        role="group"
-        aria-label="Toggle Table / JSON Schema View">
-
+          class="btn-group"
+          role="group"
+          aria-label="Toggle Tabular/JSON Schema View">
         <button
-          type="button"
-          class="btn {{if isTable 'btn-primary' 'btn-default'}}"
-          {{action "showView" "table"}}>
-          View as Table
+            type="button"
+            class="btn {{if isTable 'btn-primary'}} {{unless isTable 'btn-default'}}"
+          {{action "setView" "tabular"}}>
+          View As Tabular
         </button>
-
         <button
-          type="button"
-          class="btn {{if isTable 'btn-default' 'btn-primary'}}"
-          {{action "showView" "json"}}>
-          View as JSON
+            type="button"
+            class="btn {{if isJSON 'btn-primary'}} {{unless isJSON 'btn-default'}}"
+          {{action "setView" "json"}}>
+          View As JSON
         </button>
-
       </div>
     </div>
   </div>
-
   <table id="json-table" class="columntreegrid tree table table-bordered dataset-detail-table">
     <thead>
     <tr class="results-header">
@@ -33,10 +29,11 @@
       <th title="Is indexed" style="width:15px;">I</th>
       <th title="Is partitioned" style="width:15px;">P</th>
       <th title="Is distributed" style="width:15px;">D</th>
-      <th style="width:150px;">Default Comments</th>
+      <th class="col-xs-7"> Default Comments</th>
+      <!--
       <th title="Comment Count" style="width:15px;">
         <i class="fa fa-comments" title="Comment Count"></i>
-      </th>
+      </th>-->
     </tr>
     </thead>
     <tbody>
@@ -66,18 +63,20 @@
         </td>
         <td class="commentsArea">
           <div class="commentsArea">
-            {{!--{{#schema-comment schema=schema datasetId=dataset.id fieldId=schema.id}}{{/schema-comment}}--}}
+            {{#schema-comment schema=schema datasetId=dataset.id fieldId=schema.id}}{{/schema-comment}}
             {{schema.commentHtml}}
           </div>
         </td>
+        <!--
         <td class="text-center">
           {{schema.commentCount}}
         </td>
+        -->
       </tr>
     {{/each}}
     </tbody>
   </table>
-  <div id="json-viewer" class="hidden"></div>
+  <div id="json-viewer" style="display:none;"></div>
 {{else}}
   <div id="json-viewer"></div>
 {{/if}}

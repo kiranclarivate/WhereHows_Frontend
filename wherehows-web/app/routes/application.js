@@ -51,9 +51,16 @@ export default Route.extend(ApplicationRouteMixin, {
       target: '_blank'
     };
 
+    /*
     const brand = {
       logo: isInternal ? '/assets/assets/images/wherehows-logo.png' : '',
       avatarUrl: isInternal ? avatarUrl.replace('[username]', userName) : '/assets/assets/images/default_avatar.png'
+    };
+    */
+
+    const brand = {
+      logo: isInternal ? '/assets/assets/images/clarivate.svg' : '',
+      avatarUrl: isInternal ? avatarUrl.replace('[username]', userName) : '/assets/assets/images/clarivate.svg'
     };
 
     return { feedbackMail, brand };

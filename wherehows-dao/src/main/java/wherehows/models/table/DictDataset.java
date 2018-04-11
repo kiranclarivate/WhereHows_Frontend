@@ -15,12 +15,11 @@ package wherehows.models.table;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,86 +27,86 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "dict_dataset")
+@AllArgsConstructor
 @NoArgsConstructor
 public class DictDataset {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int id;
+  int id;
 
-  @Column(name = "\"name\"", nullable = false)
-  private String name;
+  @Column(name = "name", nullable = false)
+  String name;
 
-  @Column(name = "\"schema\"")
-  private String schema;
+  @Column(name = "schema")
+  String schema;
 
   @Column(name = "schema_type")
-  private String schemaType;
+  String schemaType;
 
   @Column(name = "properties")
-  private String properties;
+  String properties;
 
-  @Column(name = "\"fields\"")
-  private String fields;
+  @Column(name = "fields")
+  String fields;
 
-  @Column(name = "urn", nullable = false)
-  private String urn;
+  @Column(name = "urn")
+  String urn;
 
-  @Column(name = "\"source\"")
-  private String source;
+  @Column(name = "source")
+  String source;
 
   @Column(name = "location_prefix")
-  private String locationPrefix;
+  String locationPrefix;
 
   @Column(name = "parent_name")
-  private String parentName;
+  String parentName;
 
   @Column(name = "storage_type")
-  private String storageType;
+  String storageType;
 
   @Column(name = "ref_dataset_id")
-  private Integer refDatasetId;
+  Integer refDatasetId;
 
   @Column(name = "dataset_type")
-  private String datasetType;
+  String datasetType;
 
   @Column(name = "is_active")
-  private Boolean isActive;
+  Boolean isActive;
 
   @Column(name = "is_deprecated")
-  private Boolean isDeprecated;
+  Boolean isDeprecated;
 
   @Column(name = "hive_serdes_class")
-  private String hiveSerdesClass;
+  String hiveSerdesClass;
 
   @Column(name = "is_partitioned")
-  private String isPartitioned;
+  String isPartitioned;
 
   @Column(name = "partition_layout_pattern_id")
-  private Integer partitionLayoutPatternId;
+  Integer partitionLayoutPatternId;
 
   @Column(name = "sample_partition_full_path")
-  private String samplePartitionFullPath;
+  String samplePartitionFullPath;
 
   @Column(name = "source_created_time")
-  private Integer sourceCreatedTime;
+  Integer sourceCreatedTime;
 
   @Column(name = "source_modified_time")
-  private Integer sourceModifiedTime;
+  Integer sourceModifiedTime;
 
   @Column(name = "created_time")
-  private Integer createdTime;
+  Integer createdTime;
 
   @Column(name = "modified_time")
-  private Integer modifiedTime;
+  Integer modifiedTime;
 
   @Column(name = "wh_etl_exec_id")
-  private Long etlExecId;
+  Integer etlExecId;
 
   @PreUpdate
   @PrePersist
   void prePersist() {
-    Integer timestamp = (int) (System.currentTimeMillis() / 1000);
+    Integer timestamp = Integer.valueOf((int)(System.currentTimeMillis() / 1000));
     this.modifiedTime = timestamp;
     if (this.createdTime == null) {
       this.createdTime = timestamp;

@@ -1,14 +1,11 @@
 import Ember from 'ember';
 import {
   datasetComplianceUrlById,
-  createDatasetComment,
-  readDatasetComments,
+  addDatasetCommentFor,
+  datasetCommentsFor,
   deleteDatasetComment,
-  updateDatasetComment
+  modifyDatasetComment
 } from 'wherehows-web/utils/api';
-import { updateDatasetDeprecation } from 'wherehows-web/utils/api/datasets/properties';
-import { readDatasetView } from 'wherehows-web/utils/api/datasets/dataset';
-import { readDatasetOwners, updateDatasetOwners } from 'wherehows-web/utils/api/datasets/owners';
 
 const {
   set,
@@ -18,26 +15,31 @@ const {
   getWithDefault,
   setProperties,
   inject: { service },
-  $: { post, getJSON },
-  run,
-  run: { scheduleOnce },
-  Controller
+  $: { post, getJSON }
 } = Ember;
 
-export default Controller.extend({
-  queryParams: ['urn'],
+// TODO: DSS-6581 Create URL retrieval module
+const datasetsUrlRoot = '/api/v1/datasets';
+const datasetUrl = id => `${datasetsUrlRoot}/${id}`;
+const getDatasetOwnersUrl = id => `${datasetUrl(id)}/owners`;
+
+export default Ember.Controller.extend({
   /**
    * Reference to the application notifications Service
    * @type {Ember.Service}
    */
   notifications: service(),
 
-  isTable: true,
+  hasProperty: false,
   hasImpacts: false,
+  hasSchemas: false,
   hasSamples: false,
+  isTable: true,
+  isJSON: false,
   currentVersion: '0',
   latestVersion: '0',
   ownerTypes: [],
+  datasetSchemaFieldsAndTypes: [],
   userTypes: [{ name: 'Corporate User', value: 'urn:li:corpuser' }, { name: 'Group User', value: 'urn:li:corpGroup' }],
   isPinot: function() {
     var model = this.get('model');
@@ -84,7 +86,30 @@ export default Controller.extend({
     }
     return '';
   }.property('model.id'),
-
+  adjustPanes: function() {
+    var hasProperty = this.get('hasProperty');
+    var isHDFS = this.get('isHDFS');
+    if (hasProperty && !isHDFS) {
+      $('#sampletab').css('overflow', 'scroll');
+      // Adjust the height
+      // Set global adjuster
+      var height = $(window).height() * 0.99 - 185;
+      $('#sampletab').css('height', height);
+      $(window).resize(function() {
+        var height = $(window).height() * 0.99 - 185;
+        $('#sampletab').height(height);
+      });
+    }
+  }
+    .observes('hasProperty', 'isHDFS')
+    .on('init'),
+  buildJsonView: function() {
+    var model = this.get('model');
+    var schema = JSON.parse(model.schema);
+    setTimeout(function() {
+      $('#json-viewer').JSONView(schema);
+    }, 500);
+  },
   refreshVersions: function(dbId) {
     var model = this.get('model');
     if (!model || !model.id) {
@@ -128,6 +153,7 @@ export default Controller.extend({
       if (!model || !model.id) {
         return;
       }
+      _this.set('hasSchemas', false);
       var schemaUrl = '/api/v1/datasets/' + model.id + '/schema/' + version;
       $.get(schemaUrl, function(data) {
         if (data && data.status == 'ok') {
@@ -136,6 +162,12 @@ export default Controller.extend({
           }, 500);
         }
       });
+    } else {
+      if (_this.schemas) {
+        _this.set('hasSchemas', true);
+      } else {
+        _this.buildJsonView();
+      }
     }
 
     _this.set('currentVersion', version);
@@ -180,16 +212,16 @@ export default Controller.extend({
     ]);
 
     const action = {
-      create: createDatasetComment.bind(null, id),
+      create: addDatasetCommentFor.bind(null, id),
       destroy: deleteDatasetComment.bind(null, id),
-      modify: updateDatasetComment.bind(null, id)
+      modify: modifyDatasetComment.bind(null, id)
     }[strategy];
 
     try {
       await action(...args);
       notify('success', { content: 'Success!' });
       // refresh the list of comments if successful with updated response
-      set(this, 'datasetComments', await readDatasetComments(id));
+      set(this, 'datasetComments', await datasetCommentsFor(id));
 
       return true;
     } catch (e) {
@@ -200,33 +232,6 @@ export default Controller.extend({
   },
 
   actions: {
-    /**
-     * Renders the properties tab elements.
-     * temporary workaround to query parameters, the file is a holdover from the legacy WH app
-     */
-    showProperties() {
-      // FIXME: this is a stop gap pending transition to queryParams tabbed nav in datasets.
-      // :facepalm:
-      run(() => {
-        scheduleOnce('afterRender', null, () => {
-          $('.tabbed-navigation-list li.active:not(#properties)').removeClass('active');
-          $('.tabbed-navigation-list #properties').addClass('active');
-        });
-      });
-    },
-    /**
-     * Updates the dataset's deprecation properties
-     * @param {boolean} isDeprecated 
-     * @param {string} deprecationNote 
-     * @return {IDatasetView}
-     */
-    async updateDeprecation(isDeprecated, deprecationNote) {
-      const datasetId = get(this, 'datasetId');
-
-      await updateDatasetDeprecation(datasetId, isDeprecated, deprecationNote);
-      return set(this, 'datasetView', await readDatasetView(datasetId));
-    },
-
     /**
      * Action handler creates a dataset comment with the type and text pas
      * @param {CommentTypeUnion} type the comment type
@@ -257,29 +262,56 @@ export default Controller.extend({
     },
 
     /**
-     * Persists the list of owners, and if successful, updated the owners
-     * on the controller
-     * @param {Array<IOwner>} updatedOwners the list of owner to send
-     * @returns {Promise<Array<IOwner>>}
+     * Takes the list up updated owner and posts to the server
+     * @param {Ember.Array} updatedOwners the list of owner to send
+     * @returns {Promise.<T>}
      */
-    async saveOwnerChanges(updatedOwners) {
-      const { datasetId: id, 'notifications.notify': notify } = getProperties(this, [
-        'datasetId',
-        'notifications.notify'
-      ]);
+    saveOwnerChanges(updatedOwners) {
+      const datasetId = get(this, 'model.id');
       const csrfToken = getWithDefault(this, 'csrfToken', '').replace('/', '');
 
-      try {
-        await updateDatasetOwners(id, csrfToken, updatedOwners);
-        notify('success', { content: 'Success!' });
+      return Promise.resolve(
+        post({
+          url: getDatasetOwnersUrl(datasetId),
+          headers: {
+            'Csrf-Token': csrfToken
+          },
+          data: {
+            csrfToken,
+            owners: JSON.stringify(updatedOwners)
+          }
+        }).then(({ status = 'failed', msg = 'An error occurred.' }) => {
+          if (['success', 'ok'].includes(status)) {
+            return { status: 'ok' };
+          }
 
-        // updates the shared state for list of dataset owners
-        return set(this, 'owners', await readDatasetOwners(id));
-      } catch (e) {
-        notify('error', { content: e.message });
-      }
+          Promise.reject({ status, msg });
+        })
+      );
     },
 
+    setView: function(view) {
+      switch (view) {
+        case 'tabular':
+          this.set('isTable', true);
+          this.set('isJSON', false);
+          $('#json-viewer').hide();
+          $('#json-table').show();
+          break;
+        case 'json':
+          this.set('isTable', false);
+          this.set('isJSON', true);
+          this.buildJsonView();
+          $('#json-table').hide();
+          $('#json-viewer').show();
+          break;
+        default:
+          this.set('isTable', true);
+          this.set('isJSON', false);
+          $('#json-viewer').hide();
+          $('#json-table').show();
+      }
+    },
     updateVersion: function(version) {
       this.changeVersion(version);
     },

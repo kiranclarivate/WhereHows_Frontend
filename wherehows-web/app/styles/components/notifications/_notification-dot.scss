@@ -15,7 +15,7 @@
     border-color: $compliance-suggestion-hint;
   }
 
-  &--needs-review {
+  &--is-unsaved {
     border-color: set-color(blue, blue5);
   }
 
