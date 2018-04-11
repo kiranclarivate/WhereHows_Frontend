@@ -9,8 +9,8 @@ const feedback = { mail: 'wherehows-dev@linkedin.com', subject: 'WhereHows Feedb
  * @type {object}
  */
 const avatar = {
-  url: 'https://cinco.corp.linkedin.com/api/profile/[username]/picture/?access_token=2rzmbzEMGlHsszQktFY-B1TxUic',
-  fallbackUrl: '/assets/assets/images/default_avatar.png'
+  url: '/assets/images/icons/avatar1.jpeg',
+  fallbackUrl: '/assets/images/default_avatar.png'
 };
 
 /**
