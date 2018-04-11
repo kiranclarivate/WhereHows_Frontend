@@ -1,28 +1,20 @@
 import Ember from 'ember';
 import { makeUrnBreadcrumbs } from 'wherehows-web/utils/entities';
-import { readDatasetCompliance, readDatasetComplianceSuggestion } from 'wherehows-web/utils/api/datasets/compliance';
-import { readNonPinotProperties, readPinotProperties } from 'wherehows-web/utils/api/datasets/properties';
-import { readDatasetComments } from 'wherehows-web/utils/api/datasets/comments';
-import { readComplianceDataTypes } from 'wherehows-web/utils/api/list/compliance-datatypes';
+import { datasetComplianceFor, datasetComplianceSuggestionsFor } from 'wherehows-web/utils/api/datasets/compliance';
+import { datasetCommentsFor } from 'wherehows-web/utils/api/datasets/comments';
 import {
-  readDatasetColumns,
-  columnDataTypesAndFieldNames,
-  augmentObjectsWithHtmlComments
-} from 'wherehows-web/utils/api/datasets/columns';
-
-import {
-  readDatasetOwners,
+  getDatasetOwners,
   getUserEntities,
   isRequiredMinOwnersNotConfirmed
 } from 'wherehows-web/utils/api/datasets/owners';
-import { readDataset, datasetUrnToId, readDatasetView } from 'wherehows-web/utils/api/datasets/dataset';
-import isDatasetUrn from 'wherehows-web/utils/validators/urn';
 
-const { Route, get, set, setProperties, inject: { service }, $: { getJSON } } = Ember;
-// TODO: DSS-6581 Move to URL retrieval module
+const { Route, get, set, setProperties, isPresent, inject: { service }, $: { getJSON } } = Ember;
+// TODO: DSS-6581 Create URL retrieval module
 const datasetsUrlRoot = '/api/v1/datasets';
 const datasetUrl = id => `${datasetsUrlRoot}/${id}`;
 const ownerTypeUrlRoot = '/api/v1/owner/types';
+const getDatasetColumnUrl = id => `${datasetUrl(id)}/columns`;
+const getDatasetPropertiesUrl = id => `${datasetUrl(id)}/properties`;
 const getDatasetSampleUrl = id => `${datasetUrl(id)}/sample`;
 const getDatasetImpactAnalysisUrl = id => `${datasetUrl(id)}/impacts`;
 const getDatasetDependsUrl = id => `${datasetUrl(id)}/depends`;
@@ -31,6 +23,8 @@ const getDatasetReferencesUrl = id => `${datasetUrl(id)}/references`;
 const getDatasetInstanceUrl = id => `${datasetUrl(id)}/instances`;
 const getDatasetVersionUrl = (id, dbId) => `${datasetUrl(id)}/versions/db/${dbId}`;
 
+let getDatasetColumn;
+
 export default Route.extend({
   /**
    * Runtime application configuration options
@@ -38,41 +32,67 @@ export default Route.extend({
    */
   configurator: service(),
 
-  queryParams: {
-    urn: {
-      refreshModel: true
-    }
-  },
-
-  /**
-   * Reads the dataset given a identifier from the dataset endpoint
-   * @param {string} datasetIdentifier a identifier / id for the dataset to be fetched
-   * @param {string} [urn] optional urn identifier for dataset
-   * @return {Promise<IDataset>}
-   */
-  async model({ datasetIdentifier, urn }) {
-    let datasetId = datasetIdentifier;
-
-    if (datasetId === 'urn' && isDatasetUrn(urn)) {
-      datasetId = await datasetUrnToId(urn);
-    }
-
-    return await readDataset(datasetId);
-  },
-
-  /**
-   * resetting the urn query param when the hook is invoked
-   * @param {Controller} controller
-   */
-  resetController(controller) {
-    set(controller, 'urn', void 0);
-  },
-
   //TODO: DSS-6632 Correct server-side if status:error and record not found but response is 200OK
   setupController(controller, model) {
     let source = '';
     let id = 0;
     let urn = '';
+
+    /**
+     * Series of chain-able functions invoked to set set properties on the controller required for dataset tab sections
+     */
+    const fetchThenSetOnController = {
+      datasetSchemaFieldNamesAndTypes(controller, { id }) {
+        Promise.resolve(getJSON(datasetUrl(id))).then(({ dataset: { schema } = { schema: undefined } } = {}) => {
+          /**
+               * Parses a JSON dataset schema representation and extracts the field names and types into a list of maps
+               * @param {JSON} schema
+               * @returns {Array.<*>}
+               */
+          function getFieldNamesAndTypesFrom(schema = JSON.stringify({})) {
+            /**
+                 * schema argument may contain property with name `fields` or `fields` may be nested in `schema` object
+                 * with same name.
+                 * Unfortunately shape is inconsistent depending of dataset queried.
+                 * Use `fields` property if present and is an array, otherwise use `fields` property on `schema`.
+                 * Will default to empty array.
+                 * @param {Array} [nestedFields]
+                 * @param {Array} [fields]
+                 * @returns {Array.<*>}
+                 */
+            function getFieldTypeMappingArray({ schema: { fields: nestedFields = [] } = { schema: {} }, fields }) {
+              fields = Array.isArray(fields) ? fields : nestedFields;
+
+              // As above, field may contain a label with string property or a name property
+              return fields.map(({ label: { string } = {}, name, type }) => ({
+                name: string || name,
+                type: Array.isArray(type) ? (type[0] === 'null' ? type.slice(1) : type) : [type]
+              }));
+            }
+
+            schema = JSON.parse(schema);
+            return [...getFieldTypeMappingArray(schema)];
+          }
+
+          set(controller, 'datasetSchemaFieldsAndTypes', getFieldNamesAndTypesFrom(schema));
+        });
+
+        return this;
+      },
+
+      /**
+       * Sets the isInternal flag as a property on the controller
+       * @param controller {Ember.Controller} the controller to set the internal flag on
+       * @param configurator {Ember.Service}
+       * @return {Promise.<void>}
+       */
+      async isInternal(controller, { configurator }) {
+        const isInternal = await configurator.getConfig('isInternal');
+        set(controller, 'isInternal', isInternal);
+      }
+    };
+
+    set(controller, 'hasProperty', false);
 
     if (model && model.id) {
       ({ id, source, urn } = model);
@@ -94,70 +114,79 @@ export default Route.extend({
     // Don't set default zero Ids on controller
     if (id) {
       controller.set('datasetId', id);
+      // Creates list of partially applied functions from `fetchThenSetController` and invokes each in turn
+      Object.keys(fetchThenSetOnController)
+        .map(funcRef =>
+          fetchThenSetOnController[funcRef]['bind'](fetchThenSetOnController, controller, {
+            id,
+            configurator: get(this, 'configurator')
+          })
+        )
+        .forEach(func => func());
 
       /**
-       * ****************************
-       * Note: Refactor in progress *
-       * ****************************
+       * Fetch the datasetColumn
+       * @param {number} id the id of the dataset
+       */
+      getDatasetColumn = id =>
+        Promise.resolve(getJSON(getDatasetColumnUrl(id)))
+          .then(({ status, columns = [] }) => {
+            if (status === 'ok') {
+              if (columns && columns.length) {
+                const columnsWithHTMLComments = columns.map(column => {
+                  const { comment } = column;
+
+                  if (comment) {
+                    // TODO: DSS-6122 Refactor global function reference
+                    column.commentHtml = window.marked(comment).htmlSafe();
+                  }
+
+                  return column;
+                });
+
+                controller.set('hasSchemas', true);
+                controller.set('schemas', columnsWithHTMLComments);
+
+                // TODO: DSS-6122 Refactor direct method invocation on controller
+                controller.buildJsonView();
+                // TODO: DSS-6122 Refactor setTimeout,
+                //   global function reference
+                setTimeout(window.initializeColumnTreeGrid, 500);
+              }
+
+              return columns;
+            }
+
+            return Promise.reject(new Error('Dataset columns request failed.'));
+          })
+          .then(columns => columns.map(({ dataType, fullFieldPath }) => ({ dataType, fieldName: fullFieldPath })))
+          .catch(() => {
+            setProperties(controller, { hasSchemas: false, schemas: null });
+            return [];
+          });
+
+      /**
        * async IIFE sets the the complianceInfo and schemaFieldNamesMappedToDataTypes
        * at once so observers will be buffered
        * @param {number} id the dataset id
        * @return {Promise.<void>}
        */
       (async id => {
-        try {
-          let properties;
+        const [columns, compliance, complianceSuggestion, datasetComments] = await Promise.all([
+          getDatasetColumn(id),
+          datasetComplianceFor(id),
+          datasetComplianceSuggestionsFor(id),
+          datasetCommentsFor(id)
+        ]);
+        const { complianceInfo, isNewComplianceInfo } = compliance;
 
-          const [
-            { schemaless, columns },
-            compliance,
-            complianceDataTypes,
-            complianceSuggestion,
-            datasetComments,
-            isInternal,
-            datasetView,
-            owners,
-            { userEntitiesSource, userEntitiesMaps }
-          ] = await Promise.all([
-            readDatasetColumns(id),
-            readDatasetCompliance(id),
-            readComplianceDataTypes(),
-            readDatasetComplianceSuggestion(id),
-            readDatasetComments(id),
-            get(this, 'configurator').getConfig('isInternal'),
-            readDatasetView(id),
-            readDatasetOwners(id),
-            getUserEntities()
-          ]);
-          const { complianceInfo, isNewComplianceInfo } = compliance;
-          const schemas = augmentObjectsWithHtmlComments(columns);
-
-          if (String(source).toLowerCase() === 'pinot') {
-            properties = await readPinotProperties(id);
-          } else {
-            properties = { properties: await readNonPinotProperties(id) };
-          }
-
-          setProperties(controller, {
-            complianceInfo,
-            complianceDataTypes,
-            isNewComplianceInfo,
-            complianceSuggestion,
-            datasetComments,
-            schemaless,
-            schemas,
-            isInternal,
-            datasetView,
-            schemaFieldNamesMappedToDataTypes: columnDataTypesAndFieldNames(columns),
-            ...properties,
-            owners,
-            userEntitiesMaps,
-            userEntitiesSource,
-            requiredMinNotConfirmed: isRequiredMinOwnersNotConfirmed(owners)
-          });
-        } catch (e) {
-          throw e;
-        }
+        setProperties(controller, {
+          complianceInfo,
+          isNewComplianceInfo,
+          complianceSuggestion,
+          schemaFieldNamesMappedToDataTypes: columns,
+          datasetComments
+        });
       })(id);
     }
 
@@ -223,6 +252,21 @@ export default Route.extend({
     });
 
     if (source.toLowerCase() !== 'pinot') {
+      Promise.resolve(getJSON(getDatasetPropertiesUrl(id)))
+        .then(({ status, properties }) => {
+          if (status === 'ok' && properties) {
+            const propertyArray = window.convertPropertiesToArray(properties) || [];
+            if (propertyArray.length) {
+              controller.set('hasProperty', true);
+
+              return controller.set('properties', propertyArray);
+            }
+          }
+
+          return Promise.reject(new Error('Dataset properties request failed.'));
+        })
+        .catch(() => controller.set('hasProperty', false));
+
       Promise.resolve(getJSON(getDatasetSampleUrl(id)))
         .then(({ status, sampleData = {} }) => {
           if (status === 'ok') {
@@ -257,6 +301,25 @@ export default Route.extend({
           return Promise.reject(new Error('Dataset sample request failed.'));
         })
         .catch(() => set(controller, 'hasSamples', false));
+    }
+
+    if (source.toLowerCase() === 'pinot') {
+      Promise.resolve(getJSON(getDatasetPropertiesUrl(id))).then(({ status, properties = {} }) => {
+        if (status === 'ok') {
+          const { elements = [] } = properties;
+          const [{ columnNames = [], results } = {}] = elements;
+
+          if (columnNames.length) {
+            return setProperties(controller, {
+              hasSamples: true,
+              samples: results,
+              columns: columnNames
+            });
+          }
+        }
+
+        return Promise.reject(new Error('Dataset properties request failed.'));
+      });
     }
 
     Promise.resolve(getJSON(getDatasetImpactAnalysisUrl(id)))
@@ -319,9 +382,47 @@ export default Route.extend({
         return Promise.reject(new Error('Dataset references request failed.'));
       })
       .catch(() => set(controller, 'hasReferences', false));
+
+    // Retrieve the current owners of the dataset and store on the controller
+    (async id => {
+      const [owners, { userEntitiesSource, userEntitiesMaps }] = await Promise.all([
+        getDatasetOwners(id),
+        getUserEntities()
+      ]);
+      setProperties(controller, {
+        requiredMinNotConfirmed: isRequiredMinOwnersNotConfirmed(owners),
+        owners,
+        userEntitiesMaps,
+        userEntitiesSource
+      });
+    })(id);
+  },
+
+  model: ({ dataset_id }) => {
+    const datasetUrl = `${datasetsUrlRoot}/${dataset_id}`;
+
+    return Promise.resolve(getJSON(datasetUrl)).then(({ status, dataset, message = '' }) => {
+      return status === 'ok' && isPresent(dataset)
+        ? dataset
+        : Promise.reject(
+            new Error(
+              `Request for ${datasetUrl} failed with status: ${status}.
+              ${message}`
+            )
+          );
+    });
   },
 
   actions: {
+    getSchema: function() {
+      const controller = get(this, 'controller');
+      const id = get(controller, 'model.id');
+
+      set(controller, 'isTable', true);
+      set(controller, 'isJSON', false);
+      typeof getDatasetColumn === 'function' && getDatasetColumn(id);
+    },
+
     getDataset() {
       Promise.resolve(getJSON(datasetUrl(this.get('controller.model.id')))).then(
         ({ status, dataset }) => status === 'ok' && set(this, 'controller.model', dataset)

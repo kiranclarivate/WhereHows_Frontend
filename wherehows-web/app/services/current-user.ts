@@ -1,10 +1,8 @@
-import Service, { inject } from '@ember/service';
-import ComputedProperty from '@ember/object/computed';
-import { get, set } from '@ember/object';
+import Ember from 'ember';
 import { currentUser } from 'wherehows-web/utils/api/authentication';
 import { IUser } from 'wherehows-web/typings/api/authentication/user';
-import Session from 'ember-simple-auth/services/session';
 
+const { get, set, inject: { service }, Service } = Ember;
 /**
  * Indicates that the current user has already been tracked in the current session
  * @type {boolean}
@@ -12,15 +10,8 @@ import Session from 'ember-simple-auth/services/session';
  */
 let _hasUserBeenTracked = false;
 
-export default class extends Service.extend({
-  /**
-   * Reference to the application session service, implemented with Ember Simple Auth
-   * @type {ComputedProperty<Session>}
-   * @return {Service}
-   */
-  session: <ComputedProperty<Session>>inject(),
-
-  currentUser: <IUser>{},
+export default Service.extend({
+  session: service(),
 
   /**
    * Attempt to load the currently logged in user.
@@ -32,7 +23,7 @@ export default class extends Service.extend({
   async load(): Promise<void> {
     // If we have a valid session, get the currently logged in user, and set the currentUser attribute,
     // otherwise raise an exception
-    if (get(this, 'session').get('isAuthenticated')) {
+    if (get(this, 'session.isAuthenticated')) {
       const user: IUser = await currentUser();
       set(this, 'currentUser', user);
     }
@@ -41,11 +32,11 @@ export default class extends Service.extend({
   /**
    * Invalidates the current session if the session is currently valid
    * useful if, for example, the server is no able to provide the currently logged in user
-   * @return {any | Promise<void>}
+   * @return {Boolean|*|Ember.RSVP.Promise}
    */
   invalidateSession() {
     const sessionService = get(this, 'session');
-    return get(sessionService, 'isAuthenticated') && sessionService.invalidate();
+    return sessionService.isAuthenticated && sessionService.invalidate();
   },
 
   /**
@@ -57,7 +48,7 @@ export default class extends Service.extend({
    * @param {Function} userIdTracker a function that takes the userId and tracks it
    */
   trackCurrentUser(userIdTracker: (...args: Array<any>) => void = () => void 0) {
-    const userId: string = get(this, 'currentUser').userName;
+    const userId: string = get(this, 'currentUser.userName');
 
     // If we have a non-empty userId, the user hasn't already been tracked and the userIdTracker is a valid argument
     // then track the user and toggle the flag affirmative
@@ -66,4 +57,4 @@ export default class extends Service.extend({
       _hasUserBeenTracked = true;
     }
   }
-}) {}
+});

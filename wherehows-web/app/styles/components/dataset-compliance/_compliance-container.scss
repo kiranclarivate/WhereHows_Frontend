@@ -22,14 +22,6 @@
     align-items: center;
     justify-content: flex-end;
   }
-
-  &__empty#{&}__empty#{&}__empty {
-    background-color: transparent;
-
-    td {
-      border: 0;
-    }
-  }
 }
 
 /// Default visual state for dataset-field-value selector
@@ -42,10 +34,4 @@
   &--off-screen {
     visibility: hidden;
   }
-}
-
-.compliance-entities-meta {
-  padding: item-spacing(2 0 2);
-  color: #777777;
-  text-align: left;
 }

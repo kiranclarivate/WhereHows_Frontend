@@ -1,10 +1,9 @@
-import Component from '@ember/component';
-import { computed, setProperties, get, set } from '@ember/object';
-import { run, schedule, scheduleOnce } from '@ember/runloop';
-import { assert } from '@ember/debug';
+import Ember from 'ember';
 import { CommentTypeUnion, IDatasetComment } from 'wherehows-web/typings/api/datasets/comments';
 import { baseCommentEditorOptions, newCommentEditorOptions } from 'wherehows-web/constants';
-import noop from 'wherehows-web/utils/noop';
+
+const { Component, set, get, setProperties, computed, assert, run } = Ember;
+const { schedule, scheduleOnce } = run;
 
 /**
  * Returns initial properties for a new Comment
@@ -12,7 +11,7 @@ import noop from 'wherehows-web/utils/noop';
  */
 const instantiateComment = (): Partial<IDatasetComment> => ({ type: 'Comment', text: '' });
 
-export default Component.extend({
+const CommentNew = Component.extend({
   editorOptions: computed(() => ({ ...baseCommentEditorOptions, ...newCommentEditorOptions })).readOnly(),
 
   tagName: 'li',
@@ -36,24 +35,9 @@ export default Component.extend({
    */
   commentType: computed.alias('comment.type'),
 
-  /**
-   * A partial representation of a dataset comment
-   * @type {IDatasetComment | Partial<IDatasetComment>}
-   */
-  comment: <IDatasetComment | Partial<IDatasetComment>>{},
-
-  createComment: noop,
-
-  init() {
-    this._super(...arguments);
-
-    const comment: Partial<IDatasetComment> = instantiateComment();
-    set(this, 'comment', comment);
-  },
-
   didReceiveAttrs() {
     // Assert that the createComment prop is a function
-    const typeOfCreateComment = typeof this.createComment;
+    const typeOfCreateComment = typeof this.attrs.createComment;
     assert(
       `Expected action createComment to be an function (Ember action), got ${typeOfCreateComment}`,
       typeOfCreateComment === 'function'
@@ -124,8 +108,18 @@ export default Component.extend({
      * @param {CommentTypeUnion} type
      */
     changeCommentType(type: CommentTypeUnion): void {
-      const comment = get(this, 'comment');
-      set(comment, 'type', type);
+      set(this, 'comment.type', type);
     }
   }
 });
+
+Ember.Object.reopen.call(CommentNew, {
+  init() {
+    this._super(...Array.from(arguments));
+
+    const comment: Partial<IDatasetComment> = instantiateComment();
+    set(this, 'comment', comment);
+  }
+});
+
+export default CommentNew;

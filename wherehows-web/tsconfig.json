@@ -17,11 +17,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "experimentalDecorators": true,
-    "downlevelIteration": true,
     "paths": {
       "wherehows-web/*": ["app/*"],
-      "wherehows-web/tests/*": ["tests/*"],
-      "wherehows-web/mirage/*": ["mirage/*"]
+      "wherehows-web/tests/*": ["tests/*"]
     }
   },
   "include": ["app/**/*", "tests/**/*", "mirage/**/*"],

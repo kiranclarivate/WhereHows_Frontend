@@ -1,24 +1,21 @@
-import Route from '@ember/routing/route';
-import ComputedProperty from '@ember/object/computed';
-import { get } from '@ember/object';
-import { inject } from '@ember/service';
+import Ember from 'ember';
 import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 import { logout } from 'wherehows-web/utils/api/authentication';
-import Session from 'ember-simple-auth/services/session';
 
-export default class Logout extends Route.extend(AuthenticatedRouteMixin) {
+const { get, Route, inject: { service } } = Ember;
+
+export default Route.extend(AuthenticatedRouteMixin, {
   /**
-   * Reference to the application session service, implemented with Ember Simple Auth
-   * @type {ComputedProperty<Session>}
+   * @type {Ember.Service}
    */
-  session: ComputedProperty<Session> = inject();
+  session: service(),
 
-  actions = {
+  actions: {
     /**
      * Post transition, call endpoint then invalidate current session on client on success
      */
-    didTransition(this: Logout) {
+    didTransition() {
       logout().then(() => get(this, 'session').invalidate());
     }
-  };
-}
+  }
+});

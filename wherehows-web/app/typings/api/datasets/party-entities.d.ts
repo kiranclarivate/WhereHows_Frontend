@@ -15,13 +15,12 @@ export interface IPartyEntity {
 export interface IPartyEntityResponse {
   status: ApiStatus;
   userEntities?: Array<IPartyEntity>;
-  msg?: string;
 }
 
 /**
- * Describes a IUserEntityMap interface
+ * Describes a userEntityMap interface
  */
-export interface IUserEntityMap {
+export interface userEntityMap {
   [label: string]: string;
 }
 
@@ -30,6 +29,6 @@ export interface IUserEntityMap {
  */
 export interface IPartyProps {
   userEntities: Array<IPartyEntity>;
-  userEntitiesMaps: IUserEntityMap;
-  userEntitiesSource: Array<keyof IUserEntityMap>;
+  userEntitiesMaps: userEntityMap;
+  userEntitiesSource: Array<keyof userEntityMap>;
 }

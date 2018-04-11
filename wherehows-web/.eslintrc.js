@@ -1,13 +1,11 @@
 module.exports = {
   globals: {
     server: true,
-    define: true,
   },
   "extends": [
     "eslint:recommended",
     "prettier"
   ],
-  "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 8,
     "sourceType": "module",

@@ -12,6 +12,5 @@ export enum ApiStatus {
   OK = 'ok',
   // Adds support for success response used in api's like /comments, will refactored to use ok
   SUCCESS = 'success',
-  FAILED = 'failed',
-  ERROR = 'error'
+  FAILED = 'failed'
 }

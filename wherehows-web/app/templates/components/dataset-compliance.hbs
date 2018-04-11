@@ -22,14 +22,17 @@
         {{/if}}
 
         <div class="container action-bar__content">
-          {{#if (has-next editStep editSteps)}}
+          {{#if isShowingComplianceEditMode}}
             <button
               class="nacho-button nacho-button--large-inverse action-bar__item"
               title="Next"
-              {{action "nextStep"}}>
+              {{action "onEditDatasetClassification"}}>
               Next
             </button>
-          {{else}}
+          {{/if}}
+
+          {{#if isShowingDatasetClassificationEditMode}}
+
             <button
               class="nacho-button nacho-button--large-inverse action-bar__item"
               title={{unless isDatasetFullyClassified
@@ -39,13 +42,11 @@
               {{action "saveCompliance"}}>
               Save
             </button>
-          {{/if}}
 
-          {{#if (has-previous editStep editSteps)}}
             <button
               class="nacho-button--large nacho-button--secondary action-bar__item"
               title="Back"
-              {{action "previousStep"}}>
+              {{action "onEditCompliancePolicy"}}>
               Back
             </button>
 
@@ -61,14 +62,14 @@
       Last saved:
       <span class="policy-last-saved__saved">
         {{if isNewComplianceInfo 'Never'
-             (moment-from-now complianceInfo.modifiedTime)}}
+             (moment-from-now policyModificationTimeInEpoch)}}
       </span>
     </div>
 
     {{#unless isEditing}}
 
       <button
-        {{action "nextStep"}}
+        {{action "onEditCompliancePolicy"}}
         class="nacho-button--large nacho-button--secondary secondary-actions__action">
         Edit
       </button>
@@ -90,44 +91,16 @@
     </div>
   {{/if}}
 
-  {{#unless schemaless}}
-    {{#if (and (eq editStep.name editSteps.0.name) (not _hasBadData))}}
-      {{json-upload receiveJsonFile=(action "onComplianceJsonUpload") class="secondary-actions__action"}}
-    {{/if}}
-  {{/unless}}
+  {{#if (and isShowingComplianceEditMode (not _hasBadData))}}
+    {{json-upload receiveJsonFile=(action "onComplianceJsonUpload") class="secondary-actions__action"}}
+  {{/if}}
 
-  {{#if (or isReadOnly (eq editStep.name editSteps.2.name))}}
+  {{#if (or isReadOnly isShowingDatasetClassificationEditMode)}}
     {{partial "datasets/dataset-compliance/dataset-classification"}}
   {{/if}}
 
-  {{#if (or isReadOnly (eq editStep.name editSteps.1.name))}}
-    {{purge-policy
-      isEditable=(not isReadOnly)
-      platform=platform
-      purgeNote=complianceInfo.compliancePurgeNote
-      purgePolicy=(readonly complianceInfo.complianceType)
-      onPolicyChange=(action "onDatasetPurgePolicyChange")
-    }}
-  {{/if}}
-
-  {{#if schemaless}}
-
-    {{#if (or isReadOnly (eq editStep.name editSteps.0.name))}}
-      {{datasets/schemaless-tagging
-        isEditable=(not isReadOnly)
-        classification=(readonly complianceInfo.confidentiality)
-        containsPersonalData=(readonly complianceInfo.containingPersonalData)
-        onClassificationChange=(action "onDatasetSecurityClassificationChange")
-        onPersonalDataChange=(action "onDatasetLevelPolicyChange")
-      }}
-    {{/if}}
-
-  {{else}}
-
-    {{#if (or isReadOnly (eq editStep.name editSteps.0.name))}}
-      {{partial "datasets/dataset-compliance/dataset-compliance-entities"}}
-    {{/if}}
-
+  {{#if (or isReadOnly isShowingComplianceEditMode)}}
+    {{partial "datasets/dataset-compliance/dataset-compliance-entities"}}
   {{/if}}
 </div>
 
