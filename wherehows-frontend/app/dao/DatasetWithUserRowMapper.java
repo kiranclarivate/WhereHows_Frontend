@@ -47,6 +47,7 @@ public class DatasetWithUserRowMapper implements RowMapper<Dataset>
     public static final String HDFS_PREFIX = "hdfs";
     public static final String DATASET_DB_ID_COLUMN = "db_id";
     public static final String DATASET_PARENT_NAME_COLUMN = "parent_name";
+    public static final String DATASET_CATEGORY_COLUMN = "category";
 
     @Override
     public Dataset mapRow(ResultSet rs, int rowNum) throws SQLException
@@ -67,6 +68,7 @@ public class DatasetWithUserRowMapper implements RowMapper<Dataset>
         String strOwnerEmail = rs.getString(DATASET_OWNER_EMAIL_COLUMN);
         String db_id = rs.getString(DATASET_DB_ID_COLUMN);
         String parentName = rs.getString(DATASET_PARENT_NAME_COLUMN);
+        String category = rs.getString(DATASET_CATEGORY_COLUMN);
 
         Dataset dataset = new Dataset();
         dataset.id = id;
@@ -125,6 +127,7 @@ public class DatasetWithUserRowMapper implements RowMapper<Dataset>
         dataset.hasSchemaHistory = schemaHistoryId != null && schemaHistoryId > 0;
         dataset.db_id = db_id;
         dataset.parent_name = parentName;
+        dataset.category = category;
 
         return dataset;
     }
