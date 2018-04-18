@@ -360,7 +360,8 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
 			String keywords,
 			String source,
 			int page,
-			int size)
+			int size,
+			String datasetCategory)
 	{
 		ObjectNode queryNode = Json.newObject();
 		queryNode.put("from", (page-1)*size);
@@ -369,7 +370,7 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
 		ObjectNode keywordNode = null;
 
 		try {
-			keywordNode = utils.Search.generateElasticSearchQueryString(category, source, keywords);
+			keywordNode = utils.Search.generateElasticSearchQueryString(category, source, keywords, datasetCategory);
 		} catch (Exception e) {
 			Logger.error("Elastic search dataset input query is not JSON format. Error message :" + e.getMessage());
 		}
@@ -400,9 +401,11 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
 
 			if (filterNode != null) {
 				queryNode.put("filter", filterNode);
+				Logger.info("=== elasticSearchDatasetByKeyword === filterNode: " + filterNode.toString());
+			} else {
+				Logger.info("=== elasticSearchDatasetByKeyword === filterNode: NULL");
 			}
 
-			Logger.info("=== elasticSearchDatasetByKeyword === filterNode: " + filterNode.toString());
 			Logger.info(
 					" === elasticSearchDatasetByKeyword === The query sent to Elastic Search is: " + queryNode.toString());
 
@@ -500,7 +503,7 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
 
 		try
 		{
-			keywordNode = utils.Search.generateElasticSearchQueryString(category, null, keywords);
+			keywordNode = utils.Search.generateElasticSearchQueryString(category, null, keywords, null);
 		}
 		catch(Exception e)
 		{
@@ -613,7 +616,7 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
 
 		try
 		{
-			keywordNode = utils.Search.generateElasticSearchQueryString(category, null, keywords);
+			keywordNode = utils.Search.generateElasticSearchQueryString(category, null, keywords, null);
 		}
 		catch(Exception e)
 		{

@@ -132,6 +132,8 @@ public class Search extends Controller {
     String category = request().getQueryString("category");
     String source = request().getQueryString("source");
     String pageStr = request().getQueryString("page");
+    String dsCategory = request().getQueryString("ds_category");
+
     if (isBlank(pageStr)) {
       page = 1;
     } else {
@@ -186,13 +188,13 @@ public class Search extends Controller {
       }
     } else if (category.toLowerCase().equalsIgnoreCase("comments")) {
       if (isNotBlank(searchEngine) && searchEngine.equalsIgnoreCase("elasticsearch")) {
-        result.set("result", SearchDAO.elasticSearchDatasetByKeyword(category, keyword, null, page, size));
+        result.set("result", SearchDAO.elasticSearchDatasetByKeyword(category, keyword, null, page, size, dsCategory));
       } else {
         result.set("result", SearchDAO.getPagedCommentsByKeyword(category, keyword, page, size));
       }
     } else {
       if (isNotBlank(searchEngine) && searchEngine.equalsIgnoreCase("elasticsearch")) {
-        result.set("result", SearchDAO.elasticSearchDatasetByKeyword(category, keyword, source, page, size));
+        result.set("result", SearchDAO.elasticSearchDatasetByKeyword(category, keyword, source, page, size, dsCategory));
       } else {
         result.set("result", SearchDAO.getPagedDatasetByKeyword(category, keyword, source, page, size));
       }

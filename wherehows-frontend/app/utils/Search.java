@@ -138,7 +138,7 @@ public class Search {
     return suggestNode;
   }
 
-  public static ObjectNode generateElasticSearchQueryString(String category, String source, String keywords) {
+  public static ObjectNode generateElasticSearchQueryString(String category, String source, String keywords, String datasetCategory) {
     if (StringUtils.isBlank(keywords)) {
       return null;
     }
@@ -168,6 +168,14 @@ public class Search {
     shouldNode.set("should", Json.toJson(shouldValueList));
     ObjectNode queryNode = Json.newObject();
     queryNode.put("bool", shouldNode);
+
+    if (datasetCategory != null && !datasetCategory.isEmpty()) {
+      ObjectNode mustNode = Json.newObject();
+      String mustNotQueryUnit = "{\"match\" : {\"category\" : \"$VALUE\"}}".replace("$VALUE", datasetCategory);
+      mustNode.set("must", Json.toJson(mustNotQueryUnit));
+      queryNode.put("bool", mustNode);
+    }
+
     return queryNode;
   }
 
