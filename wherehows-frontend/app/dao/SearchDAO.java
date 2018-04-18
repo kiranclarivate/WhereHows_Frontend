@@ -402,6 +402,7 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
 				queryNode.put("filter", filterNode);
 			}
 
+			Logger.info("=== elasticSearchDatasetByKeyword === filterNode: " + filterNode.toString());
 			Logger.info(
 					" === elasticSearchDatasetByKeyword === The query sent to Elastic Search is: " + queryNode.toString());
 
