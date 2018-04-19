@@ -23,8 +23,30 @@
       </div>
     </div>
 
-
     <label for="search-input" class="sr-only">Search</label>
+
+    <div class="input-group-btn">
+      <div class="dropdown">
+        <button type="button"
+                class="btn btn-default dropdown-toggle nacho-button--large search-button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+          <strong class="nacho-global-search__filter">{{currentCategory}}</strong>
+          <span class="caret" aria-label="Category Search"></span>
+        </button>
+
+        <ul class="dropdown-menu">
+          {{#each categoryOptions as |category|}}
+            <li>
+              {{#dynamic-link params=category}}
+                {{category.text}}
+              {{/dynamic-link}}
+            </li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
 
     {{aupac-typeahead
       action=(action (mut search))

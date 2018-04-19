@@ -6,15 +6,15 @@
       Search for datasets, metrics and flows
     </header>
     <section class="nacho-hero__content">
-      1{{search-bar-form didSearch=(action "didSearch")}}
+      {{search-bar-form didSearch=(action "didSearch")}}
     </section>
   {{/hero-container}}
 
   <section class="container-fluid">
-    2{{partial "main"}}
+    {{partial "main"}}
   </section>
 
-  3{{notifications-service service=notifications}}
+  {{notifications-service service=notifications}}
 {{else}}
   {{outlet "login"}}
 {{/if}}

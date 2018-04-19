@@ -18,6 +18,8 @@ export default Component.extend({
   // Keywords and search Category filter
   currentFilter: 'datasets',
 
+  currentCategory: 'reference',
+
   tagName: 'form',
 
   elementId: 'global-search-form',
@@ -35,6 +37,16 @@ export default Component.extend({
       text: filter,
       action: `filter${filter.capitalize()}`,
       activeWhen: filter === currentFilter
+    }));
+  }),
+
+  categoryOptions: computed('currentCategory', function() {
+    const currentCategory = get(this, 'currentCategory');
+    return ['','reference', 'raw', 'intermediate'].map(ds_category => ({
+      title: ds_category,
+      text: ds_category,
+      action: `ds_category${ds_category.capitalize()}`,
+      activeWhen: ds_category === categoryOptions
     }));
   }),
 
