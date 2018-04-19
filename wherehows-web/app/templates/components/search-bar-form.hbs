@@ -25,6 +25,25 @@
 
     <label for="search-input" class="sr-only">Search</label>
 
+    {{aupac-typeahead
+      action=(action (mut search))
+      autoFocus=true
+      allowFreeInput=true
+      source=(action "onInput")
+      async=true
+      limit=20
+      minLength=3
+      placeholder=placeholder
+      class="form-control nacho-global-search__text-input"}}
+
+    <span class="input-group-btn">
+        <button class="btn btn-default nacho-button--large search-button"
+                id="global-search-button"
+                type="submit" {{action "search"}}>
+          <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+        </button>
+    </span>
+
     <div class="input-group-btn">
       <div class="dropdown">
         <button type="button"
@@ -48,23 +67,5 @@
       </div>
     </div>
 
-    {{aupac-typeahead
-      action=(action (mut search))
-      autoFocus=true
-      allowFreeInput=true
-      source=(action "onInput")
-      async=true
-      limit=20
-      minLength=3
-      placeholder=placeholder
-      class="form-control nacho-global-search__text-input"}}
-
-    <span class="input-group-btn">
-        <button class="btn btn-default nacho-button--large search-button"
-                id="global-search-button"
-                type="submit" {{action "search"}}>
-          <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-        </button>
-      </span>
   </div>
 </div>

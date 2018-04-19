@@ -18,7 +18,7 @@ export default Component.extend({
   // Keywords and search Category filter
   currentFilter: 'datasets',
 
-  currentCategory: 'reference',
+  currentCategory: '',
 
   tagName: 'form',
 
@@ -46,7 +46,7 @@ export default Component.extend({
       title: ds_category,
       text: ds_category,
       action: `ds_category${ds_category.capitalize()}`,
-      activeWhen: ds_category === categoryOptions
+      activeWhen: ds_category === currentCategory
     }));
   }),
 
