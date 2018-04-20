@@ -632,6 +632,8 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
 			Promise<WSResponse> responsePromise = WS.url(Play.application().configuration().getString(
 					SearchDAO.ELASTICSEARCH_FLOW_URL_KEY)).post(queryNode);
 			responseNode = responsePromise.get(1000).asJson();
+
+			Logger.debug("The responseNode from Elastic Search is: " + responseNode.toString());
 		}
 
 		ObjectNode resultNode = Json.newObject();
