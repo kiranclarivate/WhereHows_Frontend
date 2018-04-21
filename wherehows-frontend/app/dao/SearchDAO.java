@@ -710,6 +710,8 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
 		resultNode.put("count", count);
 		resultNode.put("totalPages", (int)Math.ceil(count/((double)size)));
 		resultNode.set("data", Json.toJson(pagedFlowJobs));
+
+		Logger.debug("The resultNode is: " + resultNode.toString());
 		return resultNode;
 	}
 
