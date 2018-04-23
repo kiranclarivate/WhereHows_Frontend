@@ -18,7 +18,7 @@ export default Component.extend({
   // Keywords and search Category filter
   currentFilter: 'datasets',
 
-  currentCategory: '',
+  currentCategory: 'all',
 
   tagName: 'form',
 

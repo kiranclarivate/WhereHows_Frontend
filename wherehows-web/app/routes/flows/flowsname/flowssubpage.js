@@ -22,7 +22,7 @@ export default Ember.Route.extend({
       application = links[0];
       this.controller.set('currentName', application);
       var breadcrumbs = [{"title": 'FLOWS_ROOT', "urn": "page/1"},
-        {"title": application, "urn": "name/" + application + "/page/1?urn=" + application}];
+        {"title": application, "urn": "name/" + encodeURI(application) + "/page/1?urn=" + application}];
       var listUrl = 'api/v1/list/flows/' + application;
       $.get(listUrl, function (data) {
         if (data && data.status == "ok") {
@@ -52,8 +52,8 @@ export default Ember.Route.extend({
         }
       });
       var breadcrumbs = [{"title": 'FLOWS_ROOT', "urn": "page/1"},
-        {"title": application, "urn": "name/" + application + "/page/1?urn=" + application},
-        {"title": project, "urn": "name/" + project + "/page/1?urn=" + application + '/' + project}];
+        {"title": application, "urn": "name/" + encodeURI(application) + "/page/1?urn=" + application},
+        {"title": project, "urn": "name/" + project + "/page/1?urn=" + encodeURI(application)  + '/' + project}];
       $.get(url, function (data) {
         if (data && data.status == "ok") {
           this.controller.set('model', data);

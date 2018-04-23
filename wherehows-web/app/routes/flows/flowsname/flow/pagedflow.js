@@ -35,16 +35,16 @@ export default Ember.Route.extend({
           controller.set('model', data);
           controller.set('flowId', flow);
           var breadcrumbs = [{"title": 'FLOWS_ROOT', "urn": "page/1"},
-            {"title": application, "urn": "name/" + application + "/page/1?urn=" + application},
-            {"title": project, "urn": "name/" + project + "/page/1?urn=" + application + '/' + project},
-            {"title": data.data.flow, "urn": "name/" + application + "/" + flow + "/page/1?urn=" + project}];
+            {"title": application, "urn": "name/" + encodeURI(application) + "/page/1?urn=" + application},
+            {"title": project, "urn": "name/" + project + "/page/1?urn=" + encodeURI(application) + '/' + project},
+            {"title": data.data.flow, "urn": "name/" + encodeURI(application) + "/" + flow + "/page/1?urn=" + project}];
           controller.set('breadcrumbs', breadcrumbs);
           if (data.data.flow) {
             // findAndActiveFlowNode(application, project, flow, data.data.flow);
           }
         }
       });
-      var watcherEndpoint = "/api/v1/urn/watch?urn=" + application + "/" + project + "/" + flow;
+      var watcherEndpoint = "/api/v1/urn/watch?urn=" + encodeURI(application) + "/" + project + "/" + flow;
       $.get(watcherEndpoint, function (data) {
         if (data.id && data.id !== 0) {
           controller.set('urnWatched', true)
