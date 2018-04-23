@@ -53,8 +53,8 @@ export default Component.extend({
   /**
    * Based on the currentFilter returns placeholder text
    */
-  placeholder: computed('currentFilter', function() {
-    return `Search ${get(this, 'currentFilter')} by keywords... e.g. pagekey`;
+  placeholder: computed('currentCategory', function() {
+    return `Search ${get(this, 'currentCategory')} by keywords... e.g. pagekey`;
   }),
 
   /**
@@ -64,7 +64,7 @@ export default Component.extend({
    * @return {*}
    */
   debouncedResolver() {
-    const queryResolver = get(this, 'keywords.apiResultsFor')(get(this, 'currentFilter'));
+    const queryResolver = get(this, 'keywords.apiResultsFor')(get(this, 'currentCategory'));
     return queryResolver(...arguments);
   },
 
@@ -114,9 +114,12 @@ export default Component.extend({
 
     filterReference() {
       set(this, 'currentCategory', 'reference');
+    },
+    filterRaw() {
+      set(this, 'currentCategory', 'raw');
+    },
+    filterIntermediate() {
+      set(this, 'currentCategory', 'intermediate');
     }
-
-
-
   }
 });
