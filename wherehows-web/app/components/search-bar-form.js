@@ -32,7 +32,7 @@ export default Component.extend({
    */
   filterOptions: computed('currentFilter', function() {
     const currentFilter = get(this, 'currentFilter');
-    return ['datasets', 'metrics', 'flows'].map(filter => ({
+    return ['datasets', 'metrics', 'flows', 'test'].map(filter => ({
       title: filter,
       text: filter,
       action: `filter${filter.capitalize()}`,
@@ -53,8 +53,8 @@ export default Component.extend({
   /**
    * Based on the currentFilter returns placeholder text
    */
-  placeholder: computed('currentCategory', function() {
-    return `Search ${get(this, 'currentCategory')} by keywords... e.g. pagekey`;
+  placeholder: computed('currentFilter', function() {
+    return `Search ${get(this, 'currentFilter')} by keywords... e.g. pagekey`;
   }),
 
   /**
@@ -64,7 +64,7 @@ export default Component.extend({
    * @return {*}
    */
   debouncedResolver() {
-    const queryResolver = get(this, 'keywords.apiResultsFor')(get(this, 'currentCategory'));
+    const queryResolver = get(this, 'keywords.apiResultsFor')(get(this, 'currentFilter'));
     return queryResolver(...arguments);
   },
 
