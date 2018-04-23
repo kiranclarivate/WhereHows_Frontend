@@ -42,11 +42,11 @@ export default Component.extend({
 
   categoryOptions: computed('currentCategory', function() {
     const currentCategory = get(this, 'currentCategory');
-    return ['any','reference', 'raw', 'intermediate'].map(ds_category => ({
-      title: ds_category,
-      text: ds_category,
-      action: `ds_category${ds_category.capitalize()}`,
-      activeWhen: ds_category === currentCategory
+    return ['any','reference', 'raw', 'intermediate'].map(c => ({
+      title: c,
+      text: c,
+      action: `c{c.capitalize()}`,
+      activeWhen: c === currentCategory
     }));
   }),
 
@@ -77,8 +77,7 @@ export default Component.extend({
     search() {
       this.sendAction('didSearch', {
         keyword: get(this, 'search'),
-        category: get(this, 'currentFilter'),
-        currentCategory: get(this, 'currentCategory')
+        category: get(this, 'currentFilter')
       });
     },
 
