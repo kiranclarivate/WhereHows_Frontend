@@ -77,7 +77,8 @@ export default Component.extend({
     search() {
       this.sendAction('didSearch', {
         keyword: get(this, 'search'),
-        category: get(this, 'currentFilter')
+        category: get(this, 'currentFilter'),
+        currentCategory: get(this, 'currentCategory')
       });
     },
 
@@ -99,6 +100,7 @@ export default Component.extend({
      *   TODO: DSS-6760 Create PR to handle action as closure action in dynamic-link
      *     component
      */
+     /*
     filterDatasets() {
       set(this, 'currentFilter', 'datasets');
     },
@@ -109,6 +111,6 @@ export default Component.extend({
 
     filterFlows() {
       set(this, 'currentFilter', 'flows');
-    }
+    }*/
   }
 });
