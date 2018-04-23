@@ -111,6 +111,9 @@ export default Component.extend({
     filterFlows() {
       set(this, 'currentFilter', 'flows');
     },
+    filterTest() {
+      set(this, 'currentFilter', 'test');
+    },
 
     filterReference() {
       set(this, 'currentCategory', 'reference');
