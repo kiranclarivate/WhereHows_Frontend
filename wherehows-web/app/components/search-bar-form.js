@@ -64,7 +64,7 @@ export default Component.extend({
    * @return {*}
    */
   debouncedResolver() {
-    const queryResolver = get(this, 'keywords.apiResultsFor')(get(this, 'currentFilter'));
+    const queryResolver = get(this, 'keywords.apiResultsFor')(get(this, 'currentFilter'),get(this, 'currentCategory'));
     return queryResolver(...arguments);
   },
 
@@ -77,7 +77,8 @@ export default Component.extend({
     search() {
       this.sendAction('didSearch', {
         keyword: get(this, 'search'),
-        category: get(this, 'currentFilter')
+        category: get(this, 'currentFilter'),
+        ds_category: get(this, 'currentCategory')
       });
     },
 
