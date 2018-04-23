@@ -16,6 +16,8 @@ package dao;
 import wherehows.models.table.Flow;
 import org.springframework.jdbc.core.RowMapper;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -42,6 +44,12 @@ public class FlowRowMapper implements RowMapper<Flow> {
     String group = rs.getString(FLOW_GROUP_COLUMN);
     String path = rs.getString(FLOW_PATH_COLUMN);
     Integer level = rs.getInt(FLOW_LEVEL_COLUMN);
+
+    try {
+      appCode = URLEncoder.encode(appCode, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      appCode = "";
+    }
 
     Flow flow = new Flow();
     flow.setFlow_id(id);
