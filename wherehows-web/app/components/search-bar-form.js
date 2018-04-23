@@ -18,7 +18,7 @@ export default Component.extend({
   // Keywords and search Category filter
   currentFilter: 'datasets',
 
-  currentCategory: 'all',
+  currentCategory: 'any',
 
   tagName: 'form',
 
@@ -42,11 +42,11 @@ export default Component.extend({
 
   categoryOptions: computed('currentCategory', function() {
     const currentCategory = get(this, 'currentCategory');
-    return ['any','reference', 'raw', 'intermediate'].map(c => ({
-      title: c,
-      text: c,
-      action: `c{c.capitalize()}`,
-      activeWhen: c === currentCategory
+    return ['any','reference', 'raw', 'intermediate'].map(category => ({
+      title: category,
+      text: category,
+      action: `category{category.capitalize()}`,
+      activeWhen: category === currentCategory
     }));
   }),
 
@@ -99,7 +99,7 @@ export default Component.extend({
      *   TODO: DSS-6760 Create PR to handle action as closure action in dynamic-link
      *     component
      */
-     /*
+
     filterDatasets() {
       set(this, 'currentFilter', 'datasets');
     },
@@ -110,6 +110,13 @@ export default Component.extend({
 
     filterFlows() {
       set(this, 'currentFilter', 'flows');
-    }*/
+    },
+
+    filterReference() {
+      set(this, 'currentCategory', 'reference');
+    }
+
+
+
   }
 });
