@@ -116,12 +116,15 @@ export default Component.extend({
     categoryAny() {
       set(this, 'currentCategory', 'any');
     },
+
     categoryReference() {
       set(this, 'currentCategory', 'reference');
     },
+
     categoryRaw() {
       set(this, 'currentCategory', 'raw');
     },
+
     categoryIntermediate() {
       set(this, 'currentCategory', 'intermediate');
     }
