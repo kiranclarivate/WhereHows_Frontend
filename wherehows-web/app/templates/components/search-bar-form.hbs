@@ -43,18 +43,19 @@
           <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
         </button>
     </span>
+
     <div class="input-group-btn">
-      <div class="dropdown">
+      <div class="dropdown-category">
         <button type="button"
                 class="btn btn-default dropdown-toggle nacho-button--large search-button"
-                data-toggle="dropdown"
+                data-toggle="dropdown-category"
                 aria-haspopup="true"
                 aria-expanded="false">
           <strong class="nacho-global-search__filter">{{currentCategory}}</strong>
           <span class="caret" aria-label="Category Search"></span>
         </button>
 
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu-category">
           {{#each categoryOptions as |ds_category|}}
             <li>
               {{#dynamic-link params=ds_category}}
