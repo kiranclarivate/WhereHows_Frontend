@@ -45,7 +45,7 @@ export default Component.extend({
     return ['any','reference', 'raw', 'intermediate'].map(category => ({
       title: category,
       text: category,
-      action: `category{category.capitalize()}`,
+      action: `category${category.capitalize()}`,
       activeWhen: category === currentCategory
     }));
   }),
@@ -116,13 +116,13 @@ export default Component.extend({
       set(this, 'currentFilter', 'test');
     },
 
-    filterReference() {
+    categoryReference() {
       set(this, 'currentCategory', 'reference');
     },
-    filterRaw() {
+    categoryRaw() {
       set(this, 'currentCategory', 'raw');
     },
-    filterIntermediate() {
+    categoryIntermediate() {
       set(this, 'currentCategory', 'intermediate');
     }
   }
