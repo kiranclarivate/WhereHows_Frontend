@@ -32,7 +32,7 @@ export default Component.extend({
    */
   filterOptions: computed('currentFilter', function() {
     const currentFilter = get(this, 'currentFilter');
-    return ['datasets', 'metrics', 'flows', 'test'].map(filter => ({
+    return ['datasets', 'metrics', 'flows'].map(filter => ({
       title: filter,
       text: filter,
       action: `filter${filter.capitalize()}`,
@@ -42,11 +42,11 @@ export default Component.extend({
 
   categoryOptions: computed('currentCategory', function() {
     const currentCategory = get(this, 'currentCategory');
-    return ['any','reference', 'raw', 'intermediate'].map(category => ({
-      title: category,
-      text: category,
-      action: `category${category.capitalize()}`,
-      activeWhen: category === currentCategory
+    return ['any', 'reference', 'raw', 'intermediate'].map(cat => ({
+      title: cat,
+      text: cat,
+      action: `category${cat.capitalize()}`,
+      activeWhen: cat === currentCategory
     }));
   }),
 
@@ -112,10 +112,10 @@ export default Component.extend({
     filterFlows() {
       set(this, 'currentFilter', 'flows');
     },
-    filterTest() {
-      set(this, 'currentFilter', 'test');
-    },
 
+    categoryAny() {
+      set(this, 'currentCategory', 'any');
+    },
     categoryReference() {
       set(this, 'currentCategory', 'reference');
     },
