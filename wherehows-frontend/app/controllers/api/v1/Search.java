@@ -134,6 +134,8 @@ public class Search extends Controller {
     String pageStr = request().getQueryString("page");
     String dsCategory = request().getQueryString("ds_category");
 
+    Logger.info("====== dsCategory ======" + dsCategory);
+
     if (isBlank(pageStr)) {
       page = 1;
     } else {
