@@ -14,7 +14,8 @@
   const handleSearchInput = function () {
     if (searchInput) {
       const {value: keyword} = searchInput;
-      const searchRouteHash = `#/search?keywords=${btoa(keyword)}&category=${global.g_currentCategory}&source=default&page=1`;
+      const {value: ds_category} = searchInput;
+      const searchRouteHash = `#/search?keywords=${btoa(keyword)}&category=${global.g_currentCategory}&source=default&page=1&ds_category=${ds_category}`;
       keyword && (document.location.hash = searchRouteHash);
 
       // Piwik track search keyword
