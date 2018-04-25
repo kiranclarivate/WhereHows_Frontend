@@ -141,9 +141,9 @@ public class Search extends Controller {
     Logger.info("====== dsCategory ======" + dsCategory);
     Logger.info("====== dummy ======" + dummy);
 
-    Logger.info("uri======" + request().uri);
-    Logger.info("path======" + request().path);
-    Logger.info("queryString======" + request().queryString);
+    Logger.info("uri======" + request().uri());
+    Logger.info("path======" + request().path());
+    Logger.info("queryString======" + request().queryString());
 
     if (isBlank(pageStr)) {
       page = 1;
