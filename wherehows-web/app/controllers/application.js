@@ -36,7 +36,7 @@ export default Controller.extend({
      * @param {String} [keyword] the search string to search for
      * @param {String} [category] restrict search to results found here
      */
-    didSearch({ keyword, category,  }) {
+    didSearch({ keyword, category,  ds_category}) {
       get(this, 'search').showSearchResults({ keyword, category, ds_category });
     }
   }
