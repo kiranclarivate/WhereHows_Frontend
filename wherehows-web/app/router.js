@@ -39,11 +39,11 @@ const AppRouter = Router.extend({
         const paq = window && window._paq ? window._paq : [];
         const routerJs = get(this, 'router');
         const queryParams = routerJs ? get(routerJs, 'state.queryParams') : {};
-        const { keyword, category = 'datasets', page = 1 } = queryParams;
+        const { keyword, category = 'datasets', page = 1, ds_category = 'any' } = queryParams;
 
         // Early exit once we track search, so we do not invoke the
         //   default op by invoking `trackPageView` event
-        return paq.push(['trackSiteSearch', keyword, category, page]);
+        return paq.push(['trackSiteSearch', keyword, category, page, ds_category]);
       }
 
       metrics.trackPage({ page, title });
