@@ -64,7 +64,7 @@ export default Component.extend({
    * @return {*}
    */
   debouncedResolver() {
-    const queryResolver = get(this, 'keywords.apiResultsFor')(get(this, 'currentFilter'));
+    const queryResolver = get(this, 'keywords.apiResultsFor')(get(this, 'currentFilter'), get(this, 'currentCategory'));
     return queryResolver(...arguments);
   },
 
