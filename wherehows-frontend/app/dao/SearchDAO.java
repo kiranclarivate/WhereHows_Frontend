@@ -369,6 +369,8 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
 		JsonNode responseNode = null;
 		ObjectNode keywordNode = null;
 
+		Logger.info(" === elasticSearchDatasetByKeyword === " + datasetCategory);
+
 		try {
 			keywordNode = utils.Search.generateElasticSearchQueryString(category, source, keywords, datasetCategory);
 		} catch (Exception e) {

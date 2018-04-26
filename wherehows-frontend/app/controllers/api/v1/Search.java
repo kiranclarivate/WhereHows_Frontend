@@ -133,13 +133,6 @@ public class Search extends Controller {
     String source = request().getQueryString("source");
     String pageStr = request().getQueryString("page");
     String dsCategory = request().getQueryString("ds_category");
-    String dummy = request().getQueryString("dummy");
-
-    Logger.info("====== keyword ======" + keyword);
-    Logger.info("====== category ======" + category);
-    Logger.info("====== pageStr ======" + pageStr);
-    Logger.info("====== dsCategory ======" + dsCategory);
-    Logger.info("====== dummy ======" + dummy);
 
     Logger.info("uri======" + request().uri());
     Logger.info("path======" + request().path());
