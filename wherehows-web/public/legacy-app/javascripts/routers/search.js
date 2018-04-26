@@ -62,6 +62,12 @@ App.SearchRoute = Ember.Route.extend({
             currentTab = q.category.toProperCase();
             updateActiveTab();
         }
+
+        if (q.ds_category) {
+          url += ("&ds_category=" + q.ds_category.toLowerCase());
+          //currentTab = q.ds_category.toProperCase();
+          //updateActiveTab();
+        }
         if(q.source) {
             url += '&source=' + q.source;
         }
