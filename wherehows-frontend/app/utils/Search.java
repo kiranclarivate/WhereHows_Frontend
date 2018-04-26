@@ -171,9 +171,10 @@ public class Search {
 
     if (dsCategory != null && !dsCategory.isEmpty() && !dsCategory.equals("any")) {
       ObjectNode mustNode = Json.newObject();
+
       String mustNotQueryUnit = "{\"match\" : {\"category\" : \"$VALUE\"}}".replace("$VALUE", dsCategory);
       //mustNode.set("must", Json.toJson(mustNotQueryUnit));
-      queryNode.with("bool").put("must", Json.toJson(mustNotQueryUnit));
+      queryNode.with("bool").put("must", Json.toJson(Json.parse(mustNotQueryUnit)));
       //queryNode.put("bool", mustNode);
     }
 
@@ -1074,4 +1075,5 @@ public class Search {
     queryNode.put("bool", shouldNode);
     return queryNode;
   }
+
 }
