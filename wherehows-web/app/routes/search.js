@@ -3,7 +3,7 @@ import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-rout
 import buildUrl from 'wherehows-web/utils/build-url';
 
 const { Route, isBlank, $: { getJSON } } = Ember;
-const queryParams = ['keyword', 'category', 'page', 'source'];
+const queryParams = ['keyword', 'category', 'page', 'source', 'ds_category'];
 // TODO: DSS-6581 Create URL retrieval module
 const urlRoot = '/api/v1/search';
 
