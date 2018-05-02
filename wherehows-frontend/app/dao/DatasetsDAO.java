@@ -460,6 +460,8 @@ public class DatasetsDAO extends AbstractMySQLOpenSourceDAO
 					{
 						if (StringUtils.isNotBlank(properties))
 						{
+							properties = properties.replace("u'", "'");
+							properties = properties.replace("'", "\"");
 							ds.properties = Json.parse(properties);
 						}
 					}
@@ -798,6 +800,8 @@ public class DatasetsDAO extends AbstractMySQLOpenSourceDAO
 		if (StringUtils.isNotBlank(properties))
 		{
 			try {
+				properties = properties.replace("u'", "'");
+				properties = properties.replace("'", "\"");
 				propNode = Json.parse(properties);
 
 				if (propNode != null
@@ -817,6 +821,8 @@ public class DatasetsDAO extends AbstractMySQLOpenSourceDAO
 					}
 
 					in.close();
+					resultString = resultString.replace("u'", "'");
+					resultString = resultString.replace("'", "\"");
 					JsonNode resultNode = Json.parse(resultString);
 
 					if (resultNode == null)
@@ -871,6 +877,8 @@ public class DatasetsDAO extends AbstractMySQLOpenSourceDAO
 
 		if (StringUtils.isNotBlank(strSampleData)) {
 			try {
+				strSampleData = strSampleData.replace("u'", "'");
+				strSampleData = strSampleData.replace("'", "\"");
 				sampleNode = Json.parse(strSampleData);
 				return utils.SampleData.secureSampleData(sampleNode);
 			} catch (Exception e) {
