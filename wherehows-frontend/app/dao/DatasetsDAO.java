@@ -846,11 +846,16 @@ public class DatasetsDAO extends AbstractMySQLOpenSourceDAO
 
 		rows = getJdbcTemplate().queryForList(GET_DATASET_SAMPLE_DATA_BY_ID, id);
 
+		Logger.info("sample count " + id + ":" + rows.size());
+		Logger.info("get sample: " + refID);
+
 		for (Map row : rows) {
 			refID = (Integer)row.get("ref_id");
 			strSampleData = (String)row.get("data");
 			break;
 		}
+
+		Logger.info("sample 1: " + strSampleData);
 
 		if (refID != null && refID != 0)
 		{
@@ -860,6 +865,8 @@ public class DatasetsDAO extends AbstractMySQLOpenSourceDAO
 				strSampleData = (String)row.get("data");
 				break;
 			}
+
+			Logger.info("sample 2: " + strSampleData);
 		}
 
 		if (StringUtils.isNotBlank(strSampleData)) {
@@ -871,7 +878,7 @@ public class DatasetsDAO extends AbstractMySQLOpenSourceDAO
 				Logger.error("Exception = " + e.getMessage());
 			}
 		}
-
+		Logger.info("sampleNode : " + sampleNode);
 		return sampleNode;
 	}
 
