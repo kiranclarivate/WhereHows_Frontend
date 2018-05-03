@@ -208,10 +208,10 @@
         save=(action "saveOwnerChanges")}}
     </div>
     {{#unless isSFDC}}
-      <div id="sampletab" class="tab-pane">
-        {{#dataset-sample hasSamples=hasSamples isPinot=isPinot columns=columns samples=samples}}
-        {{/dataset-sample}}
-      </div>
+          <div id="sampletab" class="tab-pane">
+            {{#dataset-sample hasSamples=hasSamples isPinot=isPinot columns=columns samples=samples}}
+            {{/dataset-sample}}
+          </div>
     {{/unless}}
     <div id="impacttab" class="tab-pane">
       {{#dataset-impact hasImpacts=hasImpacts impacts=impacts}}

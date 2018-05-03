@@ -485,7 +485,7 @@ App.DatasetRoute = Ember.Route.extend({
                               tmp['record ' + i] = d[i]
                             }
                             var node = JsonHuman.format(tmp)
-                            alert(node);
+                            //alert(node);
                             setTimeout(function(){
                               var json_human = document.getElementById('datasetSampleData-json-human');
                               if (json_human)
