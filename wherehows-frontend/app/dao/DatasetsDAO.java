@@ -881,11 +881,11 @@ public class DatasetsDAO extends AbstractMySQLOpenSourceDAO
 				strSampleData = strSampleData.replace("'", "\"");
 				sampleNode = Json.parse(strSampleData);
 				Logger.info("sampleNode1 : " + sampleNode);
-				JsonNode node = utils.SampleData.secureSampleData(sampleNode)
+				JsonNode node = utils.SampleData.secureSampleData(sampleNode);
 				Logger.info("sampleNode2 : " + node);
 
 				return node;
-				
+
 			} catch (Exception e) {
 				Logger.error("Dataset getDatasetSampleDataByID parse properties failed, id = " + id);
 				Logger.error("Exception = " + e.getMessage());
