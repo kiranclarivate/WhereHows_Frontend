@@ -205,7 +205,7 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
     Promise<WSResponse> responsePromise =
         WS.url(Play.application().configuration().getString(elasticSearchTypeURLKey)).post(keywordNode);
     responseNode = responsePromise.get(1000).asJson();
-    Logger.info("responseNode : " + responseNode.toString());
+    // Logger.info("responseNode : " + responseNode.toString());
 
     if (responseNode == null || !responseNode.isContainerNode()) {
       return completionSuggestionList;
@@ -217,7 +217,7 @@ public class SearchDAO extends AbstractMySQLOpenSourceDAO
       return completionSuggestionList;
     }
 
-    Logger.info("Response suggestNode is " + suggestNode.toString());
+    // Logger.info("Response suggestNode is " + suggestNode.toString());
 
     JsonNode whSuggestNode = suggestNode.get("wh-suggest");
     if (whSuggestNode == null || !whSuggestNode.isArray()) {

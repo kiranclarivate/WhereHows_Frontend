@@ -474,12 +474,13 @@ App.DatasetRoute = Ember.Route.extend({
                   $.get(sampleUrl, function(data) {
                     if (data && data.status == "ok")
                       {
-                        if (data.sampleData && data.sampleData.sample && (data.sampleData.sample.length > 0))
+                        // if (data.sampleData && data.sampleData.sample && (data.sampleData.sample.length > 0))
+                        if (data.sampleData && (data.sampleData.length > 0))
                           {
                             controller.set("hasSamples", true);
                             var tmp = {};
-                            var count = data.sampleData.sample.length
-                            var d = data.sampleData.sample
+                            var count = data.sampleData.length
+                            var d = data.sampleData
                             for(var i = 0; i < count; i++) {
                               tmp['record ' + i] = d[i]
                             }
