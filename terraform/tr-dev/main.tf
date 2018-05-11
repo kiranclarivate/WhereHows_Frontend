@@ -13,11 +13,9 @@ resource "aws_emr_cluster" "emr-test-cluster" {
     instance_profile                  = "svc-aws-emr-ec2-default"
   }
   
-  ebs_root_volume_size     = 100
+  instance_group = "${var.instance_groups}"
 
-  master_instance_type = "m3.xlarge"
-  core_instance_type   = "m3.xlarge"
-  core_instance_count  = 1
+  ebs_root_volume_size     = 100
 
   tags {
     role     = "created_by"
