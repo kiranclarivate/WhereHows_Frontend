@@ -31,7 +31,7 @@ resource "aws_emr_cluster" "emr-test-cluster" {
     action_on_failure = "TERMINATE_CLUSTER"
     hadoop_jar_step {
     jar="command-runner.jar"
-    args = ["spark-submit", "--deploy-mode","cluster","--class", "org.apache.spark.examples.JavaWordCount","s3://deeplens-sagemaker-richardxin/test/original-spark-examples_2.11-2.4.0-SNAPSHOT.jar", "s3://deeplens-sagemaker-richardxin/test/README.md"]
+    args = ["spark-submit", "--deploy-mode","cluster","--class", "org.apache.spark.examples.JavaWordCount","#JAR_PATH", "s3://deeplens-sagemaker-richardxin/test/README.md"]
     }
     # keep_job_flow_alive_when_no_steps = "off"
   }
