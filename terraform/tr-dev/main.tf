@@ -23,7 +23,6 @@ resource "aws_emr_cluster" "emr-test-cluster" {
     created_by = "Richard Xin"
   }
 
-  configurations = "configurations.json"
 
   service_role = "arn:aws:iam::369874303498:role/cl/svc/aws/svc-aws-emr-default"
 
@@ -32,7 +31,7 @@ resource "aws_emr_cluster" "emr-test-cluster" {
     action_on_failure = "TERMINATE_CLUSTER"
     hadoop_jar_step {
     jar="command-runner.jar"
-    args = ["--deploy-mode","cluster","--master","yarn","--class", "org.apache.spark.examples.JavaWordCount","s3://deeplens-sagemaker-richardxin/test/original-spark-examples_2.11-2.4.0-SNAPSHOT.jar"]
+    args = ["spark-submit", "--deploy-mode","cluster","--class", "org.apache.spark.examples.JavaWordCount","s3://deeplens-sagemaker-richardxin/test/original-spark-examples_2.11-2.4.0-SNAPSHOT.jar", "s3://deeplens-sagemaker-richardxin/test/README.md"]
     }
     # keep_job_flow_alive_when_no_steps = "off"
   }
