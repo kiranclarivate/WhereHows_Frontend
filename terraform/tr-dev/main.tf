@@ -32,7 +32,7 @@ resource "aws_emr_cluster" "emr-test-cluster" {
     action_on_failure = "TERMINATE_CLUSTER"
     hadoop_jar_step {
     jar="command-runner.jar"
-    args = ["--deploy-mode","cluster","--master","yarn","--class", "NotebookApplication","s3://deeplens-sagemaker-richardxin/test/sample-zeppelin.jar"]
+    args = ["--deploy-mode","cluster","--master","yarn","--class", "NotebookApplication","s3://deeplens-sagemaker-richardxin/test/original-spark-examples_2.11-2.4.0-SNAPSHOT.jar"]
     }
     # keep_job_flow_alive_when_no_steps = "off"
   }
