@@ -1,5 +1,5 @@
 resource "aws_emr_cluster" "emr-test-cluster" {
-  name          = "richardx-test-terraform"
+  name          = "#CLUSTER_NAME"
   release_label = "emr-5.12.0"
   applications  = ["Hadoop", "Hive", "Spark", "Zeppelin", "Livy"]
 
