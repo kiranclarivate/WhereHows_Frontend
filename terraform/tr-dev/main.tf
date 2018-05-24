@@ -22,7 +22,10 @@ resource "aws_emr_cluster" "emr-test-cluster" {
     application = "my-test-app"
     created_by = "Richard Xin"
   }
-
+  
+  provider "aws" {
+    region = "us-west-2"
+  }
 
   service_role = "arn:aws:iam::369874303498:role/cl/svc/aws/svc-aws-emr-default"
 
