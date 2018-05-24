@@ -21,6 +21,7 @@ public class RestClient {
     public RestClient(String zeppelinApiUrlPrefix){
         Config config= new Config();
         zeppelinAPIUrl = config.getString(zeppelinApiUrlPrefix + "zeppelin.host") + ZEPPELIN_API_PATH;
+        LOG.info("zeppelinAPIUrl == " + zeppelinAPIUrl);
     }
 
     public RestClient(){
@@ -30,6 +31,8 @@ public class RestClient {
     public String getUserDbNote(String userName, String alias){
         RestTemplate restTemplate = new RestTemplate();
         NoteListResponse response = restTemplate.getForObject(zeppelinAPIUrl, NoteListResponse.class);
+        LOG.info("getUserDbNote=" + response.getUserDbNote(userName, alias) + ":" + userName + ":" + alias);
+        LOG.info("response::::" +response.toString());
         return response.getUserDbNote(userName, alias);
     }
 
