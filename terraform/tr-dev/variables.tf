@@ -3,14 +3,14 @@ variable "instance_groups" {
     {
       name           = "MasterInstanceGroup"
       instance_role  = "MASTER"
-      instance_type  = "#INSTANCE_TYPE"
+      instance_type  = "m3.xlarge"
       instance_count = 1
     },
     {
       name           = "CoreInstanceGroup"
       instance_role  = "CORE"
-      instance_type  = "#INSTANCE_TYPE"
-      instance_count = #INSTANCE_COUNT
+      instance_type  = "m3.xlarge"
+      instance_count = 2
       bid_price      = "0.30"
     },
   ]
