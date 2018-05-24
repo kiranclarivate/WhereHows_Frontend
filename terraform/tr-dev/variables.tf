@@ -9,7 +9,7 @@ variable "instance_groups" {
     {
       name           = "CoreInstanceGroup"
       instance_role  = "CORE"
-      instance_type  = "$INSTANCE_TYPE"
+      instance_type  = "#INSTANCE_TYPE"
       instance_count = #INSTANCE_COUNT
       bid_price      = "0.30"
     },
