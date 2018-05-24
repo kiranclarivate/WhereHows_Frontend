@@ -36,4 +36,6 @@ resource "aws_emr_cluster" "emr-test-cluster" {
   }
   scale_down_behavior = "TERMINATE_AT_TASK_COMPLETION"
   log_uri = "s3://aws-logs-509786517216-us-west-2/elasticmapreduce/"
+
+  visible_to_all_users = true
 }
