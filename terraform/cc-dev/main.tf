@@ -1,7 +1,7 @@
 resource "aws_emr_cluster" "emr-test-cluster" {
   name          = "#CLUSTER_NAME"
   release_label = "emr-5.12.0"
-  applications  = ["Hadoop", "Hive", "Spark", "Zeppelin", "Livy"]
+  applications  = Hadoop,Hive,Spark
 
   termination_protection = false
   keep_job_flow_alive_when_no_steps = true
