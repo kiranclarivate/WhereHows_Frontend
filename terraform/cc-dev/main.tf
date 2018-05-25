@@ -32,11 +32,11 @@ resource "aws_emr_cluster" "emr-test-cluster" {
     jar="command-runner.jar"
     args = ["spark-submit", "--deploy-mode","cluster","--class", "org.apache.spark.examples.JavaWordCount","#JAR_PATH", #PROGRAM_ARGS]
     }
-    # keep_job_flow_alive_when_no_steps = "off"
+    keep_job_flow_alive_when_no_steps = false
   }
   scale_down_behavior = "TERMINATE_AT_TASK_COMPLETION"
   log_uri = "s3://aws-logs-509786517216-us-west-2/elasticmapreduce/"
 
   visible_to_all_users = true
-  termination_protection = false
+
 }
