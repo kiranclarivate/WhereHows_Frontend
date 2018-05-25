@@ -38,4 +38,5 @@ resource "aws_emr_cluster" "emr-test-cluster" {
   log_uri = "s3://aws-logs-509786517216-us-west-2/elasticmapreduce/"
 
   visible_to_all_users = true
+  termination_protection = false
 }
