@@ -11,7 +11,7 @@ variable "instance_groups" {
       instance_role  = "CORE"
       instance_type  = "#INSTANCE_TYPE"
       instance_count = #INSTANCE_COUNT
-      bid_price      = "0.30"
+      bid_price      = #BID_PRICE
     },
   ]
 

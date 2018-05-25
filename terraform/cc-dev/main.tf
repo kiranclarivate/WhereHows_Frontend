@@ -7,11 +7,11 @@ resource "aws_emr_cluster" "emr-test-cluster" {
   keep_job_flow_alive_when_no_steps = true
 
   ec2_attributes {
-    subnet_id                         = "subnet-a93c6ede"
-    emr_managed_master_security_group = "sg-13eca968"
-    emr_managed_slave_security_group  = "sg-cce9acb7"
-    additional_master_security_groups = "sg-f6166289"
-    instance_profile                  = "svc-aws-emr-ec2-default"
+    subnet_id                         = "#subnet_id"
+    emr_managed_master_security_group = "#emr_managed_master_security_group"
+    emr_managed_slave_security_group  = "#emr_managed_slave_security_group"
+    additional_master_security_groups = "#additional_master_security_groups"
+    instance_profile                  = "#instance_profile"
   }
   
   instance_group = "${var.instance_groups}"
