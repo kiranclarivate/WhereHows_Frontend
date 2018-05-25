@@ -30,7 +30,7 @@ resource "aws_emr_cluster" "emr-test-cluster" {
     action_on_failure = "TERMINATE_CLUSTER"
     hadoop_jar_step {
     jar="command-runner.jar"
-    args = [#SPARK_ARGS, "org.apache.spark.examples.JavaWordCount","#JAR_PATH", #PROGRAM_ARGS]
+    args = [#SPARK_ARGS,"org.apache.spark.examples.JavaWordCount","#JAR_PATH",#PROGRAM_ARGS]
     }
   }
   scale_down_behavior = "TERMINATE_AT_TASK_COMPLETION"
