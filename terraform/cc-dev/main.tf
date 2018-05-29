@@ -28,6 +28,7 @@ resource "aws_emr_cluster" "emr-test-cluster" {
   }
   
   service_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-default"
+  autoscaling_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-autoscaling"
 
   step {
     name="my-spark-program"
