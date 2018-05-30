@@ -5,7 +5,7 @@ data "template_file" "emr_configurations" {
 resource "aws_emr_cluster" "cluster" {
   name          = "#CLUSTER_NAME"
   release_label = "emr-5.12.0"
-  applications  = #APPLICATIONS,Ganglia
+  applications  = #APPLICATIONS
 
   termination_protection = false
   keep_job_flow_alive_when_no_steps = true
