@@ -3,20 +3,20 @@ variable "instance_groups" {
     {
       name           = "MasterInstanceGroup"
       instance_role  = "MASTER"
-      instance_type  = "#INSTANCE_TYPE"
+      instance_type  = "#INSTANCE_TYPE_MASTER"
       instance_count = 1
     },
     {
       name           = "CoreInstanceGroup"
       instance_role  = "CORE"
-      instance_type  = "#INSTANCE_TYPE"
+      instance_type  = "#INSTANCE_TYPE_CORE"
       instance_count = #INSTANCE_COUNT
       bid_price      = #BID_PRICE
       autoscaling_policy = <<EOF
             {
                 "Constraints": {
-                    "MinCapacity": 1,
-                    "MaxCapacity": 6
+                    "MinCapacity": #MinCapacity,
+                    "MaxCapacity": #MaxCapacity
                 },
                 "Rules": [
                 {

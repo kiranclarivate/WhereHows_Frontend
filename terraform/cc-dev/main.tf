@@ -2,7 +2,7 @@ data "template_file" "emr_configurations" {
   template = "${file("configurations.json")}"
 }
 
-resource "aws_emr_cluster" "emr-test-cluster" {
+resource "aws_emr_cluster" "cluster" {
   name          = "#CLUSTER_NAME"
   release_label = "emr-5.12.0"
   applications  = #APPLICATIONS
