@@ -24,7 +24,7 @@ resource "aws_emr_cluster" "cluster" {
 
   tags {
     application = "my-test-app"
-    created_by = "Richard Xin"
+    created_by = "#CREATED_BY"
   }
   
   service_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-default"
