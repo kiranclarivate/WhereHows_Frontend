@@ -31,7 +31,7 @@ resource "aws_emr_cluster" "cluster" {
   autoscaling_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-autoscaling"
 
   step {
-    name="my-spark-program"
+    name="#STEP_NAME"
     action_on_failure = "TERMINATE_CLUSTER"
     hadoop_jar_step {
     jar="command-runner.jar"
