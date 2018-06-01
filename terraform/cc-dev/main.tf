@@ -8,7 +8,7 @@ resource "aws_emr_cluster" "cluster" {
   applications  = #APPLICATIONS
 
   termination_protection = false
-  keep_job_flow_alive_when_no_steps = true
+  keep_job_flow_alive_when_no_steps = false
 
   ec2_attributes {
     subnet_id                         = "subnet-a93c6ede"
@@ -40,7 +40,7 @@ resource "aws_emr_cluster" "cluster" {
   }
   scale_down_behavior = "TERMINATE_AT_TASK_COMPLETION"
   log_uri = "s3://aws-logs-509786517216-us-west-2/elasticmapreduce/"
-  keep_job_flow_alive_when_no_steps = false
+
   visible_to_all_users = true
 
 }
