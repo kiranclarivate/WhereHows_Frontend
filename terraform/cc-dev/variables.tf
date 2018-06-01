@@ -11,7 +11,7 @@ variable "instance_groups" {
       instance_role  = "CORE"
       instance_type  = "#INSTANCE_TYPE_CORE"
       instance_count = #INSTANCE_COUNT
-      bid_price      = #BID_PRICE
+      #BID_PRICE
       autoscaling_policy = <<EOF
             {
                 "Constraints": {
