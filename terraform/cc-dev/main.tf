@@ -8,7 +8,7 @@ resource "aws_emr_cluster" "cluster" {
   applications  = #APPLICATIONS
 
   termination_protection = false
-  keep_job_flow_alive_when_no_steps = true
+  keep_job_flow_alive_when_no_steps = false
 
   ec2_attributes {
     subnet_id                         = "subnet-a93c6ede"
