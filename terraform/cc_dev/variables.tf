@@ -53,7 +53,7 @@ variable "instance_groups" {
   type = "list"
 }
 
-variable "tr_dev" {
+variable "cc_dev" {
         ec2_attributes = <<EOF {
             subnet_id                         = "subnet-a93c6ede"
             emr_managed_master_security_group = "sg-13eca968"
