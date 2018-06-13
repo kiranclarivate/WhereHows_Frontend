@@ -10,7 +10,7 @@ resource "aws_emr_cluster" "cluster" {
   termination_protection = false
   keep_job_flow_alive_when_no_steps = false
 
-  ec2_attributes = "${var.#AWS_ACCOUNT.ec2_attributes_tr_dev}"
+  ec2_attributes = "${var.#AWS_ACCOUNT.ec2_attributes}"
   
   instance_group = "${var.instance_groups}"
 
