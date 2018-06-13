@@ -23,8 +23,8 @@ resource "aws_emr_cluster" "cluster" {
     user_env = "#AWS_ACCOUNT"
   }
   
-  service_role = "${var.#AWS_ACCOUNT["service_role"]"
-  autoscaling_role = "${var.#AWS_ACCOUNT["autoscaling_role"]"
+  service_role = "${var.#AWS_ACCOUNT["service_role"]}"
+  autoscaling_role = "${var.#AWS_ACCOUNT["autoscaling_role"]}"
 
   step {
     name="#STEP_NAME"

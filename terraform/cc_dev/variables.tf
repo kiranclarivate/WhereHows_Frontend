@@ -69,7 +69,7 @@ variable "cc_dev" {
   type = "map"
 
   default = {
-    service_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-default"
-    autoscaling_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-autoscaling"
+      service_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-default"
+      autoscaling_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-autoscaling"
   }
 }
