@@ -25,6 +25,7 @@ resource "aws_emr_cluster" "cluster" {
   
   service_role = "${var.#AWS_ACCOUNT["service_role"]}"
   autoscaling_role = "${var.#AWS_ACCOUNT["autoscaling_role"]}"
+  log_uri = "${var.#AWS_ACCOUNT["log_uri"]}"
 
   step {
     name="#STEP_NAME"
@@ -35,7 +36,6 @@ resource "aws_emr_cluster" "cluster" {
     }
   }
   scale_down_behavior = "TERMINATE_AT_TASK_COMPLETION"
-  log_uri = "s3://aws-logs-509786517216-us-west-2/elasticmapreduce/"
 
   visible_to_all_users = true
 
