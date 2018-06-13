@@ -10,7 +10,7 @@ resource "aws_emr_cluster" "cluster" {
   termination_protection = false
   keep_job_flow_alive_when_no_steps = false
 
-  ec2_attributes = "${var.#AWS_ACCOUNT.ec2_attributes}"
+  ec2_attributes = "${var.#AWS_ACCOUNT_ec2_attributes}"
   
   instance_group = "${var.instance_groups}"
 
@@ -23,8 +23,8 @@ resource "aws_emr_cluster" "cluster" {
     user_env = "#AWS_ACCOUNT"
   }
   
-  service_role = "${var.#AWS_ACCOUNT.service_role}"
-  autoscaling_role = "${var.#AWS_ACCOUNT.autoscaling_role}"
+  service_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-default"
+  autoscaling_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-autoscaling"
 
   step {
     name="#STEP_NAME"
