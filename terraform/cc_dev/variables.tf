@@ -54,13 +54,22 @@ variable "instance_groups" {
 }
 
 variable "cc_dev_ec2_attributes" {
-        default = [
-        {
-            subnet_id                         = "subnet-a93c6ede"
-            emr_managed_master_security_group = "sg-13eca968"
-            emr_managed_slave_security_group  = "sg-cce9acb7"
-            additional_master_security_groups = "sg-f6166289"
-            instance_profile                  = "svc-aws-emr-ec2-default"
-        }
-        ]
+    default = [
+    {
+        subnet_id                         = "subnet-a93c6ede"
+        emr_managed_master_security_group = "sg-13eca968"
+        emr_managed_slave_security_group  = "sg-cce9acb7"
+        additional_master_security_groups = "sg-f6166289"
+        instance_profile                  = "svc-aws-emr-ec2-default"
+    }
+    ]
+}
+
+variable "cc_dev" {
+  type = "map"
+
+  default = {
+    service_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-default"
+    autoscaling_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-autoscaling"
+  }
 }
