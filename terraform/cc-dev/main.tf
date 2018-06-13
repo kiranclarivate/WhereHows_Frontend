@@ -1,3 +1,9 @@
+provider "aws" {
+  access_key = "${var.aws_access_key}"
+  secret_key = "${var.aws_secret_key}"
+  region     = "us-west-2"
+}
+
 data "template_file" "emr_configurations" {
   template = "${file("configurations.json")}"
 }
@@ -25,6 +31,8 @@ resource "aws_emr_cluster" "cluster" {
   tags {
     application = "my-test-app"
     created_by = "#CREATED_BY"
+    cost_center = "12345"
+    user_env = "#USER_ENV"
   }
   
   service_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-default"
