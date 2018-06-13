@@ -20,7 +20,7 @@ resource "aws_emr_cluster" "cluster" {
     application = "my-test-app"
     created_by = "#CREATED_BY"
     cost_center = "12345"
-    user_env = "#USER_ENV"
+    user_env = "#AWS_ACCOUNT"
   }
   
   service_role = "${var.#AWS_ACCOUNT.service_role}"
