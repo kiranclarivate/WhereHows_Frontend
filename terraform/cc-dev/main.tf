@@ -10,13 +10,7 @@ resource "aws_emr_cluster" "cluster" {
   termination_protection = false
   keep_job_flow_alive_when_no_steps = false
 
-  ec2_attributes {
-    subnet_id                         = "subnet-a93c6ede"
-    emr_managed_master_security_group = "sg-13eca968"
-    emr_managed_slave_security_group  = "sg-cce9acb7"
-    additional_master_security_groups = "sg-f6166289"
-    instance_profile                  = "svc-aws-emr-ec2-default"
-  }
+  ec2_attributes = "${var.#AWS_ACCOUNT.ec2_attributes_tr_dev}"
   
   instance_group = "${var.instance_groups}"
 
@@ -29,8 +23,8 @@ resource "aws_emr_cluster" "cluster" {
     user_env = "#USER_ENV"
   }
   
-  service_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-default"
-  autoscaling_role = "arn:aws:iam::509786517216:role/cl/svc/aws/svc-aws-emr-autoscaling"
+  service_role = "${var.#AWS_ACCOUNT.service_role}"
+  autoscaling_role = "${var.#AWS_ACCOUNT.autoscaling_role}"
 
   step {
     name="#STEP_NAME"
