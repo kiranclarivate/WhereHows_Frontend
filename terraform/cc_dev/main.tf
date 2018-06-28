@@ -31,8 +31,8 @@ resource "aws_emr_cluster" "cluster" {
     name="#STEP_NAME"
     action_on_failure = "TERMINATE_CLUSTER"
     hadoop_jar_step {
-    jar="command-runner.jar"
-    args = [#SPARK_ARGS,"--class","#CLASS_NAME","#JAR_PATH",#PROGRAM_ARGS]
+    jar="#JAR_PATH"
+    args = ["#CLASS_NAME"]
     }
   }
   scale_down_behavior = "TERMINATE_AT_TASK_COMPLETION"
