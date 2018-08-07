@@ -196,9 +196,11 @@ function renderTables(data) {
             }
           }
         } else if (nodes[i].node_type === 'script') {
+        	 var additional_info = ["assigned_userid","submit_Step","parameters","description","supporting_Resources","triggers","fail_codes","notification_Action","process_Initiated","abend_action","secondary_contact","primary_contact","periodicity","station","recovery_Instructions","days","resource_Medium","parameters_Values"];
           if (!firstJobNode) {
             if (nodes[i]['_sort_list']) {
               $.each(nodes[i]['_sort_list'], function(k, v) {
+            	  if(additional_info.indexOf(v) < 0){
                 jobHeader += '<th >' + v + '</th>';
                 jobHeaderNames.push(v);
                 if (nodes[i][v]) {
@@ -206,6 +208,7 @@ function renderTables(data) {
                 } else {
                   jobBody += '<td class="wrap-all-word">' + '</td>';
                 }
+            	  }
               });
             }
             firstJobNode = true;

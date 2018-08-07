@@ -50,4 +50,25 @@ public class LineageNode {
     public String full_object_name;
     public String pre_jobs;
     public String post_jobs;
+    /***Additional Information***/
+ 
+    public String assigned_userid;
+    public String submit_Step;
+    public String parameters;
+    public String description;
+    public String supporting_Resources;
+    public String triggers;
+    public String fail_codes;
+    public String notification_Action;
+    public String process_Initiated;
+    public String abend_action;
+    public String  secondary_contact;
+    public String primary_contact;
+    public String periodicity;
+    public String station;
+    public String recovery_Instructions;
+    public String days;
+    public String resource_Medium;
+    public String parameters_Values;
+    		
 }

@@ -134,7 +134,7 @@ public class LineageDAO extends AbstractMySQLOpenSourceDAO
 
 	private final static String GET_FLOW_JOB =
 			"SELECT ca.app_id, ca.app_code, je.flow_id, je.job_id, jedl.job_name, " +
-			"       fj.job_path, fj.job_type, jedl.flow_path, jedl.storage_type, jedl.source_target_type, " +
+			"       fj.job_path, fj.job_type, fj.additional_info,jedl.flow_path, jedl.storage_type, jedl.source_target_type, " +
 			"       jedl.operation, jedl.job_exec_id, fj.pre_jobs, fj.post_jobs, " +
 			"       FROM_UNIXTIME(jedl.job_start_unixtime) AS start_time, " +
 			"       FROM_UNIXTIME(jedl.job_finished_unixtime) AS end_time " +
@@ -984,11 +984,41 @@ public class LineageDAO extends AbstractMySQLOpenSourceDAO
 					30);
 			int index = 0;
 			int edgeIndex = 0;
+			String additional_info = null;
+			ObjectMapper mapper = new ObjectMapper();
 			Map<Long, LineageNode> jobNodeMap = new HashMap<Long, LineageNode>();
 			List<Pair> addedEdges = new ArrayList<Pair>();
 			if (rows != null)
 			{
 				for (Map row : jobRows) {
+					additional_info = (String) row.get("additional_info");
+					Map<String, String> ai_map = new HashMap<>();
+					try {
+						Map<String, String> map = mapper.readValue(additional_info, new TypeReference<Map<String, String>>(){});
+						
+						
+						for(Map.Entry<String, String> entry:map.entrySet()) {
+							
+							if(entry.getValue() != "") {
+								ai_map.put(entry.getKey(), entry.getValue());
+								
+							}
+							
+						}
+						
+					
+					}
+					catch (JsonGenerationException e) {
+						e.printStackTrace();
+					} catch (JsonMappingException e) {
+						e.printStackTrace();
+					} 
+					 catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+					
+					
 					Long jobExecId = ((BigInteger)row.get("job_exec_id")).longValue();
 					LineageNode node = new LineageNode();
 					node._sort_list = new ArrayList<String>();
@@ -1018,6 +1048,83 @@ public class LineageDAO extends AbstractMySQLOpenSourceDAO
 					node._sort_list.add("script_name");
 					node._sort_list.add("script_path");
 					node._sort_list.add("script_type");
+					//Additional Info
+					for(Map.Entry<String, String> entryMp: ai_map.entrySet()) {
+						if(entryMp.getKey().equalsIgnoreCase("assigned userid")) {
+							node.assigned_userid=entryMp.getValue();
+							node._sort_list.add("assigned_userid");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("Submit Step")) {
+							node.submit_Step=entryMp.getValue();
+							node._sort_list.add("submit_Step");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("Parameters")) {
+							node.parameters=entryMp.getValue();
+							node._sort_list.add("parameters");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("description")) {
+							node.description=entryMp.getValue();
+							node._sort_list.add("description");
+							}
+						else if(entryMp.getKey().equalsIgnoreCase("Supporting Resources")) {
+							node.supporting_Resources=entryMp.getValue();
+							node._sort_list.add("supporting_Resources");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("Triggers")) {
+							node.triggers=entryMp.getValue();
+							node._sort_list.add("triggers");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("fail codes")) {
+							node.fail_codes=entryMp.getValue();
+							node._sort_list.add("fail_codes");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("Notification Action")) {
+							node.notification_Action=entryMp.getValue();
+							node._sort_list.add("notification_Action");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("Process Initiated")) {
+							node.process_Initiated=entryMp.getValue();
+							node._sort_list.add("process_Initiated");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("abend action")) {
+							node.abend_action=entryMp.getValue();
+							node._sort_list.add("abend_action");
+							
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("secondary contact")) {
+							node.secondary_contact=entryMp.getValue();
+							node._sort_list.add("secondary_contact");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("primary contact")) {
+							node.primary_contact=entryMp.getValue();
+							node._sort_list.add("primary_contact");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("periodicity")) {
+							node.periodicity=entryMp.getValue();
+							node._sort_list.add("periodicity");
+						}
+						else if(entryMp.getKey().equalsIgnoreCase("station")) {
+							node.station=entryMp.getValue();
+							node._sort_list.add("station");
+						}
+						if(entryMp.getKey().equalsIgnoreCase("Restart/Recovery Instructions")) {
+							node.recovery_Instructions=entryMp.getValue();
+							node._sort_list.add("recovery_Instructions");
+						}
+						if(entryMp.getKey().equalsIgnoreCase("Day(s)")) {
+							node.days=entryMp.getValue();
+							node._sort_list.add("days");
+						}
+						if(entryMp.getKey().equalsIgnoreCase("Resource Medium")) {
+							node.resource_Medium=entryMp.getValue();
+							node._sort_list.add("resource_Medium");
+						}
+						if(entryMp.getKey().equalsIgnoreCase("Parameters Values")) {
+							node.parameters_Values=entryMp.getValue();
+							node._sort_list.add("parameters_Values");
+						}
+					}
+					
 					Integer id = addedJobNodes.get(jobExecId);
 					if (id == null)
 					{
